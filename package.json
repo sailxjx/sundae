@@ -1,6 +1,6 @@
 {
   "name": "sundae",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Real-time Web Framework",
   "main": "index.js",
   "scripts": {
