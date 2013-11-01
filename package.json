@@ -26,8 +26,14 @@
   },
   "devDependencies": {
     "should": "~2.0.2",
-    "cake-dog": "~0.2.0",
+    "cake-dog": "~0.2.1",
     "mocha": "~1.13.0",
     "docco": "~0.6.2"
+  },
+  "dependencies": {
+    "lodash": "~2.2.1",
+    "express": "~3.4.4",
+    "socket.io": "~0.9.16",
+    "async": "~0.2.9"
   }
 }

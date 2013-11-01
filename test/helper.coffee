@@ -1,1 +1,1 @@
-describe 'weblcome', ->
+require('./html')
