@@ -1,10 +1,10 @@
 {exec} = require('child_process')
 should = require('should')
-web = require('./service/web')
+webMaster = require('./web-master')
 
 describe 'web#html', ->
   before (done) ->
-    web.run({}, done)
+    webMaster.run('html', done)
 
   it 'should get ok on homepage', (done) ->
     exec 'curl http://localhost:3011', (err, stdout) ->
@@ -14,4 +14,4 @@ describe 'web#html', ->
       done()
 
   after (done) ->
-    web.die(done)
+    webMaster.die(done)

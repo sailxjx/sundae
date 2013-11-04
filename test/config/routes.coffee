@@ -1,3 +1,0 @@
-routes = ->
-
-module.exports = routes

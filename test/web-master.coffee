@@ -5,12 +5,9 @@ class WebMaster
   constructor: ->
     @isRunning = false
 
-  run: (options = {}, callback = ->) ->
+  run: (worker, callback = ->) ->
     @die() if @isRunning
-    @child = fork("#{__dirname}/web-worker.coffee")
-    setTimeout (=>
-      @child.send(JSON.stringify(options))
-      ), 200
+    @child = fork("#{__dirname}/#{worker}-worker/index.coffee")
     @child.on 'message', (msg) =>
       if msg is 'ready'
         @isRunning = true
