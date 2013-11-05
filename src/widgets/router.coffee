@@ -94,10 +94,12 @@ class Router
   http404: (handle) ->
     @_http404 = handle if typeof handle is 'function'
     @app.use(@_http404)
+    return this
 
   http500: (handle) ->
     @_http500 = handle if typeof handle is 'function' and handle.length is 4
     @app.use(@_http500)
+    return this
 
   alias: ->
 
