@@ -2,7 +2,7 @@ routes = ->
   # Set response content type
   @resType = 'html'
 
-  # Set homepage
+  # # Set homepage
   @root('home')
 
   @resource('user')

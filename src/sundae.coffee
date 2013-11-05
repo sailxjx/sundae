@@ -2,10 +2,14 @@ _ = require('lodash')
 http = require('http')
 express = require('express')
 socketIo = require('socket.io')
+logger = require('graceful-logger')
 
 class Sundae
 
   constructor: ->
+    @app = {}
+    @server = {}
+    @io = {}
     @attrs = {}
 
   init: (options = {}) ->
@@ -25,7 +29,9 @@ class Sundae
     @attrs[key]
 
   run: (callback = ->) ->
-    @server.listen(@options.port, callback)
+    @server.listen @options.port, =>
+      logger.info("Server is listening on #{@options.port}")
+      callback()
     return this
 
   use: (widget) ->

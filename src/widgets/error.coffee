@@ -54,7 +54,7 @@ class ErrorHandler
       code = @codes[flag] or @codes.error
       return new CustomError(msg, code)
     else
-      return new CustomError(err.toString(), @codes.error)
+      return new CustomError(err, @codes.error)
 
 $errorHandler = new ErrorHandler
 errorHandler = (errors) ->

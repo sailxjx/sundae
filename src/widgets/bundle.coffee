@@ -12,6 +12,7 @@ class Bundle
       @[parseMethod](weeds)
 
   parseRest: (weeds) ->
+    [@req, @res] = weeds
     @attrs =
       cookie: weeds.req?.cookies
 

@@ -13,26 +13,32 @@ error.register ->
 class Router
 
   _baseDir = process.cwd()
+  _resTypes = ['json', 'html']
 
   constructor: (@sundae) ->
     @resType = 'json'
     @appRoot = "#{sundae.get('root') or _baseDir}/app"
-    @app = @sundae.get('app')
+    @app = @sundae.app
     @rests = []
     @callback = (err, $bundle) =>
+      {req, res} = $bundle
       $bundle.err = error.parse(err)
-      @_render()  # TODO design render function
+      res.end('ok')
 
     @_http404 = (req, res, next) =>
-      @_render(404)
+      res.status(404).send('404')
 
     @_http500 = (err, req, rest, next) =>
 
     @_bindRest()
 
   _render: (data) ->
-    {status, template, result} = data
-    res.status(status).render
+    {status, type, template, result} = data
+    switch type
+      when 'json'
+        return res.status(status).json(result)
+      else
+        return res.status(status).render(template, result)
 
   _bindRest: ->
     ['get', 'post', 'put', 'delete'].map (method) =>
@@ -48,13 +54,13 @@ class Router
     fn = fn or 'index'
 
     try
-      $ctrl = require("#{@appRoot}/controllers")["#{ctrl}Controller"]
+      $ctrl = require("#{@appRoot}/controllers/#{ctrl}")
       if typeof $ctrl?[fn] isnt 'function'
         return false
     catch e
       return logger.err("Missing Controller #{ctrl}")
 
-    @_pushRoute(rest)
+    @_pushRest(rest)
     @app[method] route, (req, res) ->
       $bundle = bundle('rest', req, res)
       $ctrl[fn].call $ctrl, $bundle, (err, result) ->
@@ -96,8 +102,8 @@ class Router
   alias: ->
 
 router = (sundae) ->
-  $router = new Router(sundae)
   _router = (routes) ->
+    $router = new Router(sundae)
     if typeof routes is 'function'
       routes.call($router)
   return _router

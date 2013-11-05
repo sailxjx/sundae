@@ -32,11 +32,11 @@
   },
   "dependencies": {
     "lodash": "~2.2.1",
-    "express": "~3.4.4",
     "socket.io": "~0.9.16",
     "async": "~0.2.9",
     "graceful-logger": "~0.1.2",
     "connect-coffee-script": "~0.1.6",
-    "stylus": "~0.39.2"
+    "stylus": "~0.39.2",
+    "express": "~3.4.4"
   }
 }
