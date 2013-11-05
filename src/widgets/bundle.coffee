@@ -20,6 +20,7 @@ class Bundle
 
   set: (key, val) ->
     @attrs[key] = val
+    return this
 
   get: (key) ->
     @attrs[key]

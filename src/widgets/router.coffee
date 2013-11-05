@@ -1,3 +1,4 @@
+path = require('path')
 logger = require('graceful-logger')
 bundle = require('./bundle')
 error = require('./error')()
@@ -21,20 +22,49 @@ class Router
     @app = @sundae.app
     @rests = []
     @callback = (err, $bundle) =>
-      {req, res} = $bundle
+      {req, res, result} = $bundle
       $bundle.err = error.parse(err)
+      ctrl = $bundle.get('ctrl')
+      func = $bundle.get('func')
+      @_render {
+        status: $bundle.err.toStatus()
+        req: req
+        res: res
+        template: "#{ctrl}/#{func}"
+        result: result
+      }
       res.end('ok')
 
     @_http404 = (req, res, next) =>
-      res.status(404).send('404')
+      return res.status(500).send('1')
+      @_render {
+        status: 404
+        req: req
+        res: res
+        template: "404"
+        result: error.parse('404NotFound')
+      }
 
     @_http500 = (err, req, rest, next) =>
+      @_render {
+        status: 500
+        req: req
+        res: res
+        template: '500'
+        result: error.parse('500ServerError')
+      }
 
     @_bindRest()
 
   _render: (data) ->
-    {status, type, template, result} = data
-    switch type
+    {status, req, res, template, result} = data
+
+    if path.extname(req.url) in _resTypes
+      resType = path.extname(req.url)
+    else
+      resType = @resType
+
+    switch resType
       when 'json'
         return res.status(status).json(result)
       else
@@ -50,12 +80,12 @@ class Router
 
   _applyCtrl: (rest, callback = ->) ->
     [method, route, to] = rest
-    [ctrl, fn] = to.split('@')
-    fn = fn or 'index'
+    [ctrl, func] = to.split('@')
+    func = func or 'index'
 
     try
       $ctrl = require("#{@appRoot}/controllers/#{ctrl}")
-      if typeof $ctrl?[fn] isnt 'function'
+      if typeof $ctrl?[func] isnt 'function'
         return false
     catch e
       return logger.err("Missing Controller #{ctrl}")
@@ -63,7 +93,8 @@ class Router
     @_pushRest(rest)
     @app[method] route, (req, res) ->
       $bundle = bundle('rest', req, res)
-      $ctrl[fn].call $ctrl, $bundle, (err, result) ->
+      $bundle.set('func', func).set('ctrl', ctrl)
+      $ctrl[func].call $ctrl, $bundle, (err, result) ->
         $bundle.set('result', result)
         callback(err, $bundle)
 

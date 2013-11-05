@@ -1,7 +1,7 @@
 class HomeController
 
   index: (bundle, callback = ->) ->
-    callback(null, 'hello world')
+    callback(null, 'ok')
 
 homeController = new HomeController
 homeController.HomeController = HomeController

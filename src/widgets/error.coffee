@@ -23,6 +23,7 @@ class ErrorHandler
   constructor: ->
     @_codes =
       error: 502900
+      succ: 200000
     @_msgs =
       error: 'Unknown Error'
       succ: 'Success'
@@ -53,8 +54,10 @@ class ErrorHandler
         msg = @msgs.error
       code = @codes[flag] or @codes.error
       return new CustomError(msg, code)
-    else
+    else if err?
       return new CustomError(err, @codes.error)
+    else
+      return new CustomError(null, @codes.succ)
 
 $errorHandler = new ErrorHandler
 errorHandler = (errors) ->
