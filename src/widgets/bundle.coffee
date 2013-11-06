@@ -1,9 +1,28 @@
 class Bundle
 
+  Mixed = ->
+
+  _checkType = (val, type) ->
+    switch type
+      when Object, Array, Buffer, Date
+        return val instanceof type
+      when String
+        return typeof val is 'string'
+      when Number
+        return tyepof val is 'number'
+      when Boolean
+        return typeof val is 'boolean'
+      when Mixed
+        return true
+      else
+        return false
+
   schema:
-    cookie: Object
-    lang: String
-    result: Object
+    req: Object
+    res: Object
+    ctrl: String
+    func: String
+    data: Mixed
 
   constructor: (type, weeds) ->
     @attrs = {}
@@ -12,14 +31,12 @@ class Bundle
       @[parseMethod](weeds)
 
   parseRest: (weeds) ->
-    [@req, @res] = weeds
-    @attrs =
-      cookie: weeds.req?.cookies
 
   parseSocket: (weeds) ->
 
   set: (key, val) ->
-    @attrs[key] = val
+    if @schema[key]? and _checkType(val, @schema[key])
+      @attrs[key] = val
     return this
 
   get: (key) ->
@@ -27,12 +44,6 @@ class Bundle
 
   toJSON: ->
     return @attrs
-
-  @__defineGetter__ 'args', ->
-    return @args
-
-  @__defineGetter__ 'result', ->
-    return @attr['result']
 
 bundle = (type = 'rest', weeds...) ->
   return new Bundle(type, weeds)

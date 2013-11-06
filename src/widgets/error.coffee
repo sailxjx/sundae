@@ -2,13 +2,14 @@ _ = require('lodash')
 
 class CustomError extends Error
 
-  constructor: (@msg = '', @code = null) ->
+  constructor: (@msg = '', @code = null, @data = {}) ->
     super
 
   toJSON: ->
     return {
       code: @toCode()
       msg: @toMsg()
+      data: @toData()
     }
 
   toCode: -> Number(@code.toString()[3..])
@@ -17,16 +18,21 @@ class CustomError extends Error
 
   toMsg: -> @msg
 
+  toData: -> @data
+
 
 class ErrorHandler
 
   constructor: ->
     @_codes =
-      error: 502900
       succ: 200000
+      error: 500900
+      '404': 404901
     @_msgs =
       error: 'Unknown Error'
       succ: 'Success'
+      '404': '404 Not Found'
+
     Object.defineProperties this, {
       'codes': {
         get: -> @_codes
@@ -41,23 +47,16 @@ class ErrorHandler
   register: (errors) ->
     errors.call(this) if typeof errors is 'function'
 
-  parse: (err) ->
+  parse: (err, data) ->
     if typeof err is 'string' and @msgs[err]?
-      $err = new CustomError(@msgs[err], @codes[err])
-    else if err instanceof Array
-      [flag, args] = err
-      if typeof @msgs[flag] is 'function'
-        msg = @msgs[flag].apply(this, args)
-      else if @msgs[flag]?
-        msg = @msgs[flag]
-      else
-        msg = @msgs.error
-      code = @codes[flag] or @codes.error
-      return new CustomError(msg, code)
+      msg = if typeof @msgs[err] is 'function' then msg = @msgs[err](data) else @msgs[err]
+      $err = new CustomError(msg, @codes[err], data)
+    else if err instanceof CustomError
+      return err
     else if err?
-      return new CustomError(err, @codes.error)
+      return new CustomError(err, @codes.error, data)
     else
-      return new CustomError(null, @codes.succ)
+      return new CustomError(@msgs.succ, @codes.succ, data)
 
 $errorHandler = new ErrorHandler
 errorHandler = (errors) ->

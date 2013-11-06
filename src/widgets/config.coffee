@@ -13,6 +13,7 @@ class Config
     {io, app} = this
 
     app.configure ->
+      app.use(express.favicon(path.join(__dirname, '../../favicon.ico')))
       app.set('views', "#{_baseDir}/app/views")
       app.set('view engine', 'jade')
       app.use(express.cookieParser())

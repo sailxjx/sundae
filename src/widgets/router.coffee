@@ -3,14 +3,6 @@ logger = require('graceful-logger')
 bundle = require('./bundle')
 error = require('./error')()
 
-error.register ->
-  @codes =
-    methodNotFound: 500905
-
-  @msgs =
-    methodNotFound: (method) ->
-      "Method #{method} not found!"
-
 class Router
 
   _baseDir = process.cwd()
@@ -22,43 +14,36 @@ class Router
     @app = @sundae.app
     @rests = []
     @callback = (err, $bundle) =>
-      {req, res, result} = $bundle
-      $bundle.err = error.parse(err)
-      ctrl = $bundle.get('ctrl')
-      func = $bundle.get('func')
-      @_render {
-        status: $bundle.err.toStatus()
-        req: req
-        res: res
-        template: "#{ctrl}/#{func}"
-        result: result
-      }
-      res.end('ok')
+      if err?
+        @_http500(err, $bundle.get('req'), $bundle.get('res'))
+      else
+        @_render {
+          err: error.parse(err, $bundle.get('data'))
+          req: $bundle.get('req')
+          res: $bundle.get('res')
+          template: "#{$bundle.get('ctrl')}/#{$bundle.get('func')}"
+        }
 
     @_http404 = (req, res, next) =>
-      return res.status(500).send('1')
       @_render {
-        status: 404
+        err: error.parse('404')
         req: req
         res: res
         template: "404"
-        result: error.parse('404NotFound')
       }
 
-    @_http500 = (err, req, rest, next) =>
+    @_http500 = (err, req, res, next) =>
       @_render {
-        status: 500
+        err: error.parse(err)
         req: req
         res: res
         template: '500'
-        result: error.parse('500ServerError')
       }
 
     @_bindRest()
 
   _render: (data) ->
-    {status, req, res, template, result} = data
-
+    {err, req, res, template} = data
     if path.extname(req.url) in _resTypes
       resType = path.extname(req.url)
     else
@@ -66,9 +51,9 @@ class Router
 
     switch resType
       when 'json'
-        return res.status(status).json(result)
+        return res.status(err.toStatus()).json(err)
       else
-        return res.status(status).render(template, result)
+        return res.status(err.toStatus()).render(template, err.toData())
 
   _bindRest: ->
     ['get', 'post', 'put', 'delete'].map (method) =>
@@ -92,10 +77,13 @@ class Router
 
     @_pushRest(rest)
     @app[method] route, (req, res) ->
-      $bundle = bundle('rest', req, res)
-      $bundle.set('func', func).set('ctrl', ctrl)
-      $ctrl[func].call $ctrl, $bundle, (err, result) ->
-        $bundle.set('result', result)
+      $bundle = bundle('rest')
+      $bundle.set('req', req)
+             .set('res', res)
+             .set('func', func)
+             .set('ctrl', ctrl)
+      $ctrl[func].call $ctrl, $bundle, (err, data) ->
+        $bundle.set('data', data)
         callback(err, $bundle)
 
   _pushRest: (rest) ->

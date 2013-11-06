@@ -7,9 +7,6 @@ logger = require('graceful-logger')
 class Sundae
 
   constructor: ->
-    @app = {}
-    @server = {}
-    @io = {}
     @attrs = {}
 
   init: (options = {}) ->
@@ -34,9 +31,9 @@ class Sundae
       callback()
     return this
 
-  use: (widget) ->
+  use: (widget, args...) ->
     if typeof widget is 'function'
-      widget.call(this)
+      widget.apply(this, args)
     return this
 
 sundae = new Sundae

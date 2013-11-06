@@ -1,0 +1,3 @@
+errors = ->
+
+module.exports = errors
