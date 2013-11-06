@@ -1,4 +1,3 @@
-http = require('http')
 sundae = require('../../index')
 
 sundae
