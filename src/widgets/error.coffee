@@ -20,6 +20,7 @@ class CustomError extends Error
 
   toData: -> @data
 
+  stringify: -> JSON.stringify(@toJSON())
 
 class ErrorHandler
 

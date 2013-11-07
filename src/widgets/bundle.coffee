@@ -24,6 +24,7 @@ class Bundle
     func: String
     data: Mixed
     options: Object
+    socket: Object
 
   constructor: (type, weeds) ->
     @attrs = {}

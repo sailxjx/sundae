@@ -40,5 +40,6 @@ sundae = new Sundae
 sundae.Sundae = Sundae
 sundae.router = require('./widgets/router')(sundae)
 sundae.config = require('./widgets/config')(sundae)
+sundae.event = require('./widgets/event')(sundae)
 sundae.error = require('./widgets/error')
 module.exports = sundae

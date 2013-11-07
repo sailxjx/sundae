@@ -9,5 +9,6 @@ sundae.init({
   .use(sundae.config('default'))
   .use(sundae.error(require('./config/errors')))
   .use(sundae.router(require('./config/routes')))
+  .use(sundae.event(require('./config/events')))
   .run ->
     logger.info("Server running on #{port}")
