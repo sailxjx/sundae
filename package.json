@@ -28,7 +28,8 @@
     "should": "~2.0.2",
     "cake-dog": "~0.2.1",
     "mocha": "~1.13.0",
-    "docco": "~0.6.2"
+    "docco": "~0.6.2",
+    "coffee-script": "~1.6.3"
   },
   "dependencies": {
     "lodash": "~2.2.1",
