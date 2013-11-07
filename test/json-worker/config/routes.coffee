@@ -1,6 +1,6 @@
 routes = ->
   # Set response content type
-  @resType = 'json'
+  @application = 'json'
 
   # Set homepage
   @root('home')

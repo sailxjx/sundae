@@ -2,8 +2,7 @@ sundae = require('../index')
 logger = require('graceful-logger')
 
 port = 3010
-sundae
-  .init({
+sundae.init({
     port: port
   })
   .set('root', __dirname)

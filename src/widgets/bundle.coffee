@@ -23,6 +23,7 @@ class Bundle
     ctrl: String
     func: String
     data: Mixed
+    options: Object
 
   constructor: (type, weeds) ->
     @attrs = {}

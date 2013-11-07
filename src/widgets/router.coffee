@@ -9,11 +9,12 @@ class Router
   _resTypes = ['json', 'html']
 
   constructor: (@sundae) ->
-    @resType = 'json'
+    @application = 'json'
     @appRoot = "#{sundae.get('root') or _baseDir}/app"
     @app = @sundae.app
     @rests = []
     @callback = (err, $bundle) =>
+      options = $bundle.get('options')
       if err?
         @_http500(err, $bundle.get('req'), $bundle.get('res'))
       else
@@ -22,6 +23,7 @@ class Router
           req: $bundle.get('req')
           res: $bundle.get('res')
           template: "#{$bundle.get('ctrl')}/#{$bundle.get('func')}"
+          application: options.application
         }
 
     @_http404 = (req, res, next) =>
@@ -43,13 +45,14 @@ class Router
     @_bindRest()
 
   _render: (data) ->
-    {err, req, res, template} = data
-    if path.extname(req.url) in _resTypes
-      resType = path.extname(req.url)
-    else
-      resType = @resType
+    {err, req, res, template, application} = data
+    unless application
+      if path.extname(req.url) in _resTypes
+        application = path.extname(req.url)
+      else
+        application = @application
 
-    switch resType
+    switch application
       when 'json'
         return res.status(err.toStatus()).json(err)
       else
@@ -57,13 +60,14 @@ class Router
 
   _bindRest: ->
     ['get', 'post', 'put', 'delete'].map (method) =>
-      @[method] = (route, options, callback) =>
+      @[method] = (route, options = {}) =>
         {to} = options
-        callback = callback or @callback
         return logger.err("Missing Destination in Route: #{route}") unless to?
-        @_applyCtrl([method, route, to], callback)
+        @_applyCtrl([method, route, to], options)
 
-  _applyCtrl: (rest, callback = ->) ->
+  _applyCtrl: (rest, options = {}) ->
+    callback = options.callback or @callback
+
     [method, route, to] = rest
     [ctrl, func] = to.split('@')
     func = func or 'index'
@@ -82,6 +86,7 @@ class Router
              .set('res', res)
              .set('func', func)
              .set('ctrl', ctrl)
+             .set('options', options)
       $ctrl[func].call $ctrl, $bundle, (err, data) ->
         $bundle.set('data', data)
         callback(err, $bundle)
@@ -92,12 +97,10 @@ class Router
   showRests: ->
     @rests
 
-  root: (to, callback) ->
-    callback = callback or @callback
-    @_applyCtrl(['get', '/', to], callback)
+  root: (to, options = {}) ->
+    @_applyCtrl(['get', '/', to], options)
 
-  resource: (ctrl, callback) ->
-    callback = callback or @callback
+  resource: (ctrl, options = {}) ->
     restMap = [
       ['get', "/#{ctrl}", "#{ctrl}@index"]
       ['get', "/#{ctrl}/:id", "#{ctrl}@show"]
@@ -108,7 +111,7 @@ class Router
       ['delete', "/#{ctrl}/:id", "#{ctrl}@destroy"]
     ]
     for rest in restMap
-      @_applyCtrl(rest, callback)
+      @_applyCtrl(rest, options)
 
   http404: (handle) ->
     @_http404 = handle if typeof handle is 'function'
