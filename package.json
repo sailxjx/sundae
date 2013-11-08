@@ -38,6 +38,7 @@
     "graceful-logger": "~0.1.2",
     "connect-coffee-script": "~0.1.6",
     "stylus": "~0.39.2",
-    "express": "~3.4.4"
+    "express": "~3.4.4",
+    "jade": "~0.35.0"
   }
 }
