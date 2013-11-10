@@ -1,4 +1,4 @@
-class Bundle
+class Bucket
 
   Mixed = ->
 
@@ -47,7 +47,7 @@ class Bundle
   toJSON: ->
     return @attrs
 
-bundle = (type = 'rest', weeds...) ->
-  return new Bundle(type, weeds)
+bucket = (type = 'rest', weeds...) ->
+  return new Bucket(type, weeds)
 
-module.exports = bundle
+module.exports = bucket

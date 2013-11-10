@@ -1,6 +1,6 @@
 logger = require('graceful-logger')
 error = require('./error')
-bundle = require('./bundle')
+bucket = require('./bucket')
 
 error = error ->
   @codes =
@@ -31,9 +31,9 @@ class Event
     catch e
       return logger.warn(error.parse('invalidSocketController', data).stringify())
 
-    $bundle = bundle('event')
-    $ctrl[func].call $ctrl, $bundle, (err, data) ->
-      $bundle.set('data', data)
+    $bucket = bucket('event')
+    $ctrl[func].call $ctrl, $bucket, (err, data) ->
+      $bucket.set('data', data)
       console.log data
 
   register: (event, callback = ->) ->

@@ -1,6 +1,6 @@
 path = require('path')
 logger = require('graceful-logger')
-bundle = require('./bundle')
+bucket = require('./bucket')
 error = require('./error')()
 
 class Router
@@ -13,16 +13,16 @@ class Router
     @appRoot = "#{sundae.get('root') or _baseDir}/app"
     @app = @sundae.app
     @rests = []
-    @callback = (err, $bundle) =>
-      options = $bundle.get('options')
+    @callback = (err, $bucket) =>
+      options = $bucket.get('options')
       if err?
-        @_http500(err, $bundle.get('req'), $bundle.get('res'))
+        @_http500(err, $bucket.get('req'), $bucket.get('res'))
       else
         @_render {
-          err: error.parse(err, $bundle.get('data'))
-          req: $bundle.get('req')
-          res: $bundle.get('res')
-          template: "#{$bundle.get('ctrl')}/#{$bundle.get('func')}"
+          err: error.parse(err, $bucket.get('data'))
+          req: $bucket.get('req')
+          res: $bucket.get('res')
+          template: "#{$bucket.get('ctrl')}/#{$bucket.get('func')}"
           application: options.application
         }
 
@@ -81,15 +81,15 @@ class Router
 
     @_pushRest(rest)
     @app[method] route, (req, res) ->
-      $bundle = bundle('rest')
-      $bundle.set('req', req)
+      $bucket = bucket('rest')
+      $bucket.set('req', req)
              .set('res', res)
              .set('func', func)
              .set('ctrl', ctrl)
              .set('options', options)
-      $ctrl[func].call $ctrl, $bundle, (err, data) ->
-        $bundle.set('data', data)
-        callback(err, $bundle)
+      $ctrl[func].call $ctrl, $bucket, (err, data) ->
+        $bucket.set('data', data)
+        callback(err, $bucket)
 
   _pushRest: (rest) ->
     @rests.push(rest)
