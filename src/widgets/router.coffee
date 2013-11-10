@@ -55,6 +55,8 @@ class Router
     switch application
       when 'json'
         return res.status(err.toStatus()).json(err)
+      when 'text'
+        return res.status(err.toStatus()).send(err.stringify())
       else
         return res.status(err.toStatus()).render(template, err.toData())
 

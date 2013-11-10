@@ -3,11 +3,11 @@ routes = ->
   @application = 'json'
 
   # Set homepage
-  @root('home', {application: 'html'})
+  @root('home', {application: 'text'})
 
   @resource('user')
 
-  @get('/500', {to: '500'})
+  @get('/500', {to: '500', application: 'html'})
 
   @http404()
 
