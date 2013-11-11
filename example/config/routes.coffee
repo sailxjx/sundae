@@ -1,9 +1,9 @@
 routes = ->
   # Set response content type
-  @application = 'json'
+  @application = 'html'
 
   # Set homepage
-  @root('home', {application: 'text'})
+  @root('home', {application: 'html'})
 
   @resource('user')
 
