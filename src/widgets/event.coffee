@@ -34,7 +34,6 @@ class Event
     $bucket = bucket('event')
     $ctrl[func].call $ctrl, $bucket, (err, data) ->
       $bucket.set('data', data)
-      console.log data
 
   register: (event, callback = ->) ->
 
