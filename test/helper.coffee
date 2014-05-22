@@ -1,2 +1,0 @@
-require('./html')
-require('./json')
