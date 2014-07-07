@@ -1,4 +1,3 @@
-/.compile.pid
 node_modules
 bower_components
 public/
