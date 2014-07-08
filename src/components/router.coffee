@@ -5,7 +5,6 @@ Response = require './response'
 Request = require './request'
 backbone = require './backbone'
 $path = require 'path'
-api = require './api'
 
 class Router
 
@@ -16,7 +15,7 @@ class Router
   prefix: null
 
   # Route map of restful requests
-  _resource = (ctrl) ->
+  _resource: (ctrl) ->
     ctrl = inflection.pluralize(ctrl)
     readOne: # Read One By Ids
       method: 'get'
@@ -53,7 +52,7 @@ class Router
   callback: (req, res) -> res.json()
 
   resource: (ctrl, options = {}) ->
-    map = _resource(ctrl)
+    map = @_resource(ctrl)
 
     {only, except} = options
     if only?
@@ -62,15 +61,12 @@ class Router
       map = _.omit(map, except)
 
     for action, opt of map
-      _options = _.extend(
-        options
-      ,
+      _options = _.extend options,
         ctrl: ctrl
         action: action
         method: opt.method
         path: opt.path
-      )
-      @_apply(options)
+      @_apply _options
 
   get: ->
     options = _parseDsl.apply(this, arguments)
@@ -103,16 +99,12 @@ class Router
     callback or= @callback
     action or= 'index'
 
-    $ctrl = require("../controllers/#{ctrl}")
+    sundae = require '../sundae'
+    $ctrl = require $path.join sundae.get('mainPath'), "controllers/#{ctrl}"
     return false unless typeof $ctrl[action] is 'function'
 
     if typeof path is 'string' and @prefix
       path = '/' + $path.join(@prefix, path)
-
-    api.set "#{ctrl}.#{action}",
-      path: path
-      method: method
-      ensure: $ctrl[action].ensure
 
     @app[method] path, (req, res) ->
       params = _.extend(
@@ -125,9 +117,6 @@ class Router
       )
       params.session = req.session
       params.cookies = req.cookies
-
-      if req.headers?['authorization'] and req.headers['authorization'].indexOf('token') isnt -1
-        params.accessToken = req.headers['authorization'].replace('token', '').trim()
 
       _req = new Request params
       _res = new Response res: res

@@ -1,76 +1,17 @@
-_ = require 'lodash'
-validator = require 'validator'
-
 class Request
 
   # Keys will import as Request properties
-  importKeys = [
-    '_sessionUserId'
-    'session'
-    'cookies'
-  ]
+  importKeys = ['session', 'cookies']
 
   # Keys will find by `get` method
-  allowdKeys = _.uniq(importKeys.concat([
-    'lang'
-    '_id'
-    '_roomId'
-    '_userId'
-    '_teamId'
-    '_toId'  # For message
-    'maxDate'
-    'minDate'
-    'token'
-    'title'
-    'content'
-    'name'
-    'socketId'
-    'limit'
-    'page'
-    'accessToken'
-    'clientId'
-    'clientSecret'
-    'password'
-    'email'
-    'source'
-    'topic'
-    'avatarUrl'
-    'inviteCode'
-    'nextUrl'
-    'mobile'
-    'notification'
-    'category'
-    'fileKey'
-    'fileName'
-    'fileType'
-    '_messageId'
-    'desktopNotification'
-    'emailNotification'
-    'isDone'
-  ]))
+  allowdKeys = {}
 
-  alias:  # Keys should be lowercase
-    'x-socket-id': 'socketId'
-    '_withid': '_toId'
+  # Alias keys will be converted to the value key
+  # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
+  # Keys should be lowercase
+  alias: {}
 
-  validators:
-    _general: (val, key) ->
-      if key.match /^_.*id$/i  # _ObjectId type
-        return if "#{val}".match /[0-9a-f]{24}/ then val else null
-      if key.match /Date$/i  # Date type
-        date = new Date(val)
-        return if date.getDate() then date else null
-      if key.match /url$/i
-        return if validator.isURL(val) then val else null
-      return val
-    limit: (limit) ->
-      limit = parseInt(limit)
-      return limit if 0 < limit < 30
-      return null
-    email: (email) ->
-      email = email.trim()
-      return null unless validator.isEmail(email)
-      return email
+  validators: {}
 
   setters: {}
 
@@ -99,7 +40,7 @@ class Request
 
     @_params[key] = val if key in allowdKeys or force
     @[key] = val if key in importKeys
-    return @_params
+    return this
 
   # Remove a property from params
   remove: (keys...) ->
