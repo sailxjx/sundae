@@ -17,6 +17,7 @@ class Sundae
     @set 'mainPath', mainPath
     @config 'routes', require path.join mainPath, 'config/routes'
     @config 'express', require path.join mainPath, 'config/express'
+    @config 'request', require path.join mainPath, 'config/request'
     return this
 
   set: (key, val) ->
@@ -31,7 +32,5 @@ class Sundae
     app.listen @_params['port'] or app.get('port') or 3000, callback
 
 sundae = new Sundae
-sundae.Request = require './components/request'
-sundae.Response = require './components/response'
 
 module.exports = sundae

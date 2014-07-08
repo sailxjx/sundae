@@ -1,10 +1,10 @@
 class Request
 
   # Keys will import as Request properties
-  importKeys = ['session', 'cookies']
+  importKeys: ['session', 'cookies']
 
   # Keys will find by `get` method
-  allowdKeys = {}
+  allowedKeys: []
 
   # Alias keys will be converted to the value key
   # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
@@ -38,8 +38,8 @@ class Request
     val = _validator(val, key) if _validator?
     return @_params if val is null
 
-    @_params[key] = val if key in allowdKeys or force
-    @[key] = val if key in importKeys
+    @_params[key] = val if key in @allowedKeys or force
+    @[key] = val if key in @importKeys
     return this
 
   # Remove a property from params

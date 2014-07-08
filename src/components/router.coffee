@@ -2,7 +2,6 @@ _ = require 'lodash'
 async = require 'async'
 inflection = require 'inflection'
 Response = require './response'
-Request = require './request'
 backbone = require './backbone'
 $path = require 'path'
 
@@ -117,6 +116,8 @@ class Router
       )
       params.session = req.session
       params.cookies = req.cookies
+      Request = require './request'
+      console.log Request.toString()
 
       _req = new Request params
       _res = new Response res: res
