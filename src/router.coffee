@@ -1,6 +1,7 @@
 _ = require 'lodash'
 async = require 'async'
 inflection = require 'inflection'
+Request = require './request'
 Response = require './response'
 backbone = require './backbone'
 $path = require 'path'
@@ -98,7 +99,7 @@ class Router
     callback or= @callback
     action or= 'index'
 
-    sundae = require '../sundae'
+    sundae = require './sundae'
     $ctrl = require $path.join sundae.get('mainPath'), "controllers/#{ctrl}"
     return false unless typeof $ctrl[action] is 'function'
 
@@ -116,8 +117,6 @@ class Router
       )
       params.session = req.session
       params.cookies = req.cookies
-      Request = require './request'
-      console.log Request.toString()
 
       _req = new Request params
       _res = new Response res: res

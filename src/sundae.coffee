@@ -1,6 +1,6 @@
 path = require 'path'
 express = require 'express'
-configs = require './configs'
+configer = require './configer'
 
 class Sundae
 
@@ -12,12 +12,17 @@ class Sundae
     @_configs[key] = fn
     return this
 
+  plugin: ->
+
+  modify: ->
+
+  # Give me a path
+  # I'll deal everything for you
   scaffold: (mainPath) ->
     mainPath = path.resolve mainPath
     @set 'mainPath', mainPath
     @config 'routes', require path.join mainPath, 'config/routes'
     @config 'express', require path.join mainPath, 'config/express'
-    @config 'request', require path.join mainPath, 'config/request'
     return this
 
   set: (key, val) ->
@@ -28,7 +33,7 @@ class Sundae
 
   run: (callback = ->) ->
     app = express()
-    configs[key]?(app, fn) for key, fn of @_configs
+    configer[key]?(app, fn) for key, fn of @_configs
     app.listen @_params['port'] or app.get('port') or 3000, callback
 
 sundae = new Sundae
