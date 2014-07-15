@@ -1,22 +1,32 @@
 class Request
 
   # Keys will import as Request properties
-  importKeys: ['session', 'cookies']
+  @importKeys: []
 
   # Keys will find by `get` method
-  allowedKeys: []
+  @allowedKeys: []
 
   # Alias keys will be converted to the value key
   # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
   # Keys should be lowercase
-  alias: {}
+  @alias: {}
 
-  validators: {}
+  @validators: {}
 
-  setters: {}
+  @setters: {}
 
-  constructor: (params = {}) ->
+  constructor: (@req) ->
     @_params = {}
+    params = _.extend(
+      @req.headers or {}
+      @req.cookies or {}
+      @req.params or {}
+      @req.query or {}
+      @req.body or {}
+      @req.session or {}
+    )
+    @session = @req.session
+    @cookies = @req.cookies
     @set(k, v) for k, v of params
 
   get: (key) ->
@@ -27,19 +37,19 @@ class Request
   # @param `val` key-value's value
   # @param `force` ignore allowed keys
   set: (key, val, force = false) ->
-    aliasKey = @alias[key.toLowerCase()]
+    aliasKey = Request.alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
 
-    if typeof @setters[key] is 'function'
-      return @setters[key].call(this, val)
+    if typeof Request.setters[key] is 'function'
+      return Request.setters[key].call(this, val)
 
     # Validators will filter the value and set null to invalid values
-    _validator = @validators[key] or @validators['_general']
+    _validator = Request.validators[key] or Request.validators['_general']
     val = _validator(val, key) if _validator?
     return @_params if val is null
 
-    @_params[key] = val if key in @allowedKeys or force
-    @[key] = val if key in @importKeys
+    @_params[key] = val if key in Request.allowedKeys or force
+    @[key] = val if key in Request.importKeys
     return this
 
   # Remove a property from params

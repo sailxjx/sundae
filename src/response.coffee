@@ -1,9 +1,8 @@
 class Response
 
-  constructor: (params = {}) ->
+  constructor: (@res) ->
     @_params = {}
-    @_isReplied = false
-    @set(k, v) for k, v of params
+    @_replied = false
 
   get: (key) ->
     return if key? then @_params[key] else @_params
@@ -23,18 +22,18 @@ class Response
 
   # Send a json formated data
   json: ->
-    unless @_isReplied
+    unless @_replied
       res = @get 'res'
       @parse (status, data) =>
         res.status(status).json(data)
-        @_isReplied = true
+        @_replied = true
 
   # Redirect to another url
   redirect: ->
-    unless @_isReplied
+    unless @_replied
       res = @get 'res'
       res.redirect.apply res, arguments
-      @_isReplied = true
+      @_replied = true
 
   cookie: ->
     res = @get 'res'
