@@ -33,6 +33,8 @@
     "lodash": "^2.4.1",
     "express": "^4.5.1",
     "inflection": "^1.3.8",
-    "err1st": "^0.1.1"
+    "err1st": "^0.1.1",
+    "shelljs": "^0.3.0",
+    "commander": "^2.3.0"
   }
 }
