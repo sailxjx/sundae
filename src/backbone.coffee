@@ -1,12 +1,14 @@
 async = require 'async'
 
-backbone = ($ctrl, ctrl, action, middlewares, req, res, callback) ->
+backbone = (req, res, callback) ->
+
+  {$ctrl, action, middlewares} = req
 
   async.waterfall [
-    # Load request middlewares
+    # Load route level middlewares
     (next) ->
-      async.eachSeries middlewares, (fn, _next) ->
-        fn(req, res, _next)
+      async.eachSeries middlewares, (fn, next) ->
+        fn req, res, next
       , next
 
     # Call controller action
@@ -17,13 +19,8 @@ backbone = ($ctrl, ctrl, action, middlewares, req, res, callback) ->
         $ctrl[action] req, next
 
   ], (err, result) ->
-    res.set('err', err)
-    res.set('result', result)
-    return callback(req, res) if err?
-
-    if typeof $ctrl[action].post is 'function'
-      $ctrl[action].post(req, res, result)
-
-    callback(req, res)
+    res.set 'err', err
+    res.set 'result', result
+    callback req, res
 
 module.exports = backbone

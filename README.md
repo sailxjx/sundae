@@ -11,6 +11,7 @@ Sundae is a light weight api framework based on express, but more intesting than
 
 # TODO
 * [ ] extend framework components
+* [ ] find an elegant way to load middlewares
 
 [npm-url]: https://npmjs.org/package/sundae
 [npm-image]: http://img.shields.io/npm/v/sundae.svg
