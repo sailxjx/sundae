@@ -4,7 +4,7 @@ inflection = require 'inflection'
 Request = require './request'
 Response = require './response'
 backbone = require './backbone'
-$path = require 'path'
+p = require 'path'
 
 class Router
 
@@ -29,7 +29,7 @@ class Router
     update:
       method: 'put'
       path: "/#{ctrl}/:_id"
-    delete:
+    remove:
       method: 'delete'
       path: "/#{ctrl}/:_id"
 
@@ -100,11 +100,11 @@ class Router
     action or= 'index'
 
     sundae = require './sundae'
-    $ctrl = require $path.join sundae.get('mainPath'), "controllers/#{ctrl}"
+    $ctrl = require p.join sundae.get('mainPath'), "controllers/#{ctrl}"
     return false unless typeof $ctrl[action] is 'function'
 
     if typeof path is 'string' and @prefix
-      path = '/' + $path.join(@prefix, path)
+      path = '/' + p.join(@prefix, path)
 
     @app[method] path, (req, res) ->
       params = _.extend(
@@ -119,8 +119,14 @@ class Router
       params.cookies = req.cookies
 
       _req = new Request params
+      _req.$ctrl = $ctrl
+      _req.ctrl = ctrl
+      _req.action = action
+      _req.middlewares = middlewares
+
       _res = new Response res: res
-      backbone($ctrl, ctrl, action, middlewares, _req, _res, callback)
+
+      backbone(_req, _res, callback)
 
 router = (app) -> new Router(app)
 

@@ -1,3 +1,5 @@
+_ = require 'lodash'
+
 class Request
 
   # Keys will import as Request properties
@@ -15,7 +17,7 @@ class Request
 
   @setters: {}
 
-  constructor: (@req) ->
+  constructor: (@req = {}) ->
     @_params = {}
     params = _.extend(
       @req.headers or {}

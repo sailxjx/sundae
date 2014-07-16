@@ -1,13 +1,15 @@
 should = require 'should'
 Request = require '../lib/request'
 Response = require '../lib/response'
-sundae = require '../'
+configer = require '../lib/configer'
+express = require 'express'
+app = express()
 
 describe 'Configer#Request', ->
 
   it 'should modify the properties of Request object', ->
 
-    sundae.config 'request', (_Request) ->
+    configer.request app, (_Request) ->
       # Modify
       _Request.allowedKeys = ["name"]
       # Check
@@ -20,5 +22,5 @@ describe 'Configer#Request', ->
 
   it 'should modify the properties of Response object', ->
 
-    sundae.config 'response', (_Response) ->
+    configer.response 'response', (_Response) ->
       # Do nothing

@@ -1,6 +1,6 @@
 class Response
 
-  constructor: (@res) ->
+  constructor: (@res = {}) ->
     @_params = {}
     @_replied = false
 
