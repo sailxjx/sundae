@@ -107,24 +107,13 @@ class Router
       path = '/' + p.join(@prefix, path)
 
     @app[method] path, (req, res) ->
-      params = _.extend(
-        req.headers
-        req.cookies
-        req.params
-        req.query
-        req.body
-        req.session
-      )
-      params.session = req.session
-      params.cookies = req.cookies
-
-      _req = new Request params
+      _req = new Request req
       _req.$ctrl = $ctrl
       _req.ctrl = ctrl
       _req.action = action
       _req.middlewares = middlewares
 
-      _res = new Response res: res
+      _res = new Response res
 
       backbone(_req, _res, callback)
 

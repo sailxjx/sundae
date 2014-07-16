@@ -1,1 +1,1 @@
-module.exports = (app, fn) -> fn? app
+module.exports = (app) ->

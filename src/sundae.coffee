@@ -38,7 +38,7 @@ class Sundae
     for _config in @_configs
       [key, fn] = _config
       configer[key]?(app, fn)
-    app.listen @_params['port'] or app.get('port') or 3000, callback
+    app.listen @_params['port'] or app.get('port') or 7000, callback
 
 sundae = new Sundae
 sundae.middlewares = middlewares

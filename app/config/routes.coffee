@@ -1,2 +1,3 @@
 module.exports = (router) ->
-  router.resource 'user'
+
+  router.get '/', to: 'home#index'

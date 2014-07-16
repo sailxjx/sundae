@@ -23,20 +23,17 @@ class Response
   # Send a json formated data
   json: ->
     unless @_replied
-      res = @get 'res'
       @parse (status, data) =>
-        res.status(status).json(data)
+        @res.status(status).json(data)
         @_replied = true
 
   # Redirect to another url
   redirect: ->
     unless @_replied
-      res = @get 'res'
-      res.redirect.apply res, arguments
+      @res.redirect.apply @res, arguments
       @_replied = true
 
   cookie: ->
-    res = @get 'res'
-    res.cookie.apply res, arguments
+    @res.cookie.apply @res, arguments
 
 module.exports = Response
