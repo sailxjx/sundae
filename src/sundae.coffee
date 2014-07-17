@@ -8,13 +8,16 @@ class Sundae
   constructor: ->
     @_configs = []
     @_params = {}
+    @_middlewares = []
     @set 'mainPath', path.join(process.cwd(), 'app')
 
   config: (key, fn) ->
     @_configs.push [key, fn]
     return this
 
-  middleware: (fn) ->
+  use: (fn) ->
+    @_middlewares.push(fn)
+    return this
 
   # Give me a path
   # I'll deal everything for you
@@ -25,6 +28,7 @@ class Sundae
     @config 'response', require path.join mainPath, 'config/response'
     @config 'routes', require path.join mainPath, 'config/routes'
     @config 'express', require path.join mainPath, 'config/express'
+    @use middlewares.ensure
     return this
 
   set: (key, val) ->
