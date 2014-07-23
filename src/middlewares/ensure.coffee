@@ -3,15 +3,12 @@
 Err = require 'err1st'
 
 ensure = (req, res, ensures, callback) ->
-  ensures = ensures.split ' ' if typeof ensures is 'string'
-  return callback(null) unless ensures instanceof Array
+  ensures = ensures.split new RegExp(' +') if toString.call(ensures) is '[object String]'
+  return callback(null) unless toString.call(ensures) is '[object Array]'
 
   missings = []
-
   ensures.forEach (_ensure) -> missings.push(_ensure) unless req.get(_ensure)?
-
-  if missings.length > 0
-    return callback(new Err('MISSING_PARAMS', missings))
+  return callback(new Err('MISSING_PARAMS', missings)) if missings.length > 0
 
   callback(null)
 
