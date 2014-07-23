@@ -1,0 +1,1 @@
+Response = require '../lib/response'

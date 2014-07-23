@@ -17,28 +17,27 @@ class Request
 
   @setters: {}
 
-  constructor: (@req = {}) ->
+  constructor: (req = {}) ->
+    @__proto__ = req
     @_params = {}
     params = _.extend(
-      @req.headers or {}
-      @req.cookies or {}
-      @req.params or {}
-      @req.query or {}
-      @req.body or {}
-      @req.session or {}
+      @headers or {}
+      @cookies or {}
+      @params or {}
+      @query or {}
+      @body or {}
+      @session or {}
     )
-    @session = @req.session
-    @cookies = @req.cookies
     @set(k, v) for k, v of params
 
-  get: (key) ->
+  get: (key) =>
     return if key? then @_params[key] else @_params
 
   # Set Params in Request Object
   # @param `key` key-value's key
   # @param `val` key-value's value
   # @param `force` ignore allowed keys
-  set: (key, val, force = false) ->
+  set: (key, val, force = false) =>
     aliasKey = Request.alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
 
@@ -55,7 +54,7 @@ class Request
     return this
 
   # Remove a property from params
-  remove: (keys...) ->
+  remove: (keys...) =>
     for key in keys
       delete @_params[key]
       delete @[key]
