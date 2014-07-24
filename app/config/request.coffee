@@ -1,11 +1,11 @@
-module.exports = (Request) ->
+module.exports = (req) ->
 
-  Request.importKeys = []
+  req.importKeys = []
 
-  Request.allowedKeys = []
+  req.allowedKeys = []
 
-  Request.alias = {}
+  req.alias = {}
 
-  Request.validators = {}
+  req.validators = {}
 
-  Request.setters = {}
+  req.setters = {}

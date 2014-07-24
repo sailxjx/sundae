@@ -119,4 +119,7 @@ class Router
 
 router = (app) -> new Router(app)
 
+router.configer = (app, fn) ->
+  fn? router(app)
+
 module.exports = router

@@ -1,6 +1,6 @@
 should = require 'should'
-Request = require '../lib/request'
-Response = require '../lib/response'
+request = require '../lib/request'
+response = require '../lib/response'
 configer = require '../lib/configer'
 express = require 'express'
 app = express()
@@ -9,11 +9,10 @@ describe 'Configer#Request', ->
 
   it 'should modify the properties of Request object', ->
 
-    configer.request app, (_Request) ->
+    configer.request app, (_request) ->
       # Modify
-      _Request.allowedKeys = ["name"]
+      _request.allowedKeys = ["name"]
       # Check
-      Request.allowedKeys.should.containEql 'name'
       req = new Request
       req.set 'name', 'Grace'
       req.set 'email', 'grace@gmail.com'
@@ -22,5 +21,5 @@ describe 'Configer#Request', ->
 
   it 'should modify the properties of Response object', ->
 
-    configer.response 'response', (_Response) ->
+    configer.response 'response', (_response) ->
       # Do nothing

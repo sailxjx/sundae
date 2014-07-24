@@ -41,7 +41,7 @@ class Sundae
     app = express()
     for _config in @_configs
       [key, fn] = _config
-      configer[key]?(app, fn)
+      configer[key]?(fn)
     app.listen @_params['port'] or app.get('port') or 7000, callback
 
 sundae = new Sundae

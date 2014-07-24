@@ -1,9 +1,10 @@
 router = require './router'
-Request = require './request'
-Response = require './response'
+request = require './request'
+response = require './response'
+express = require './express'
 
 module.exports =
-  routes: (app, fn) -> fn? router(app)
-  express: (app, fn) -> fn? app
-  request: (app, fn) -> fn? Request
-  response: (app, fn) -> fn? Response
+  routes: router.configer
+  express: express.configer
+  request: request.configer
+  response: response.configer

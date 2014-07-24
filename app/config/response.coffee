@@ -1,1 +1,1 @@
-module.exports = (Response) ->
+module.exports = (res) ->

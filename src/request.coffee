@@ -1,66 +1,69 @@
 _ = require 'lodash'
 
-class Request
-
-  # Keys will import as Request properties
-  @importKeys: []
+options =
+  # Keys will import as request properties
+  importKeys: []
 
   # Keys will find by `get` method
-  @allowedKeys: []
+  allowedKeys: []
 
   # Alias keys will be converted to the value key
   # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
   # Keys should be lowercase
-  @alias: {}
+  alias: {}
 
-  @validators: {}
+  validators: {}
 
-  @setters: {}
+  setters: {}
 
-  constructor: (req = {}) ->
-    @__proto__ = req
-    @_params = {}
-    params = _.extend(
-      @headers or {}
-      @cookies or {}
-      @params or {}
-      @query or {}
-      @body or {}
-      @session or {}
-    )
-    @set(k, v) for k, v of params
-
+request = (req, res, next) ->
   # Get param in request object
   # @param {String} key
   # @return {Mixed} value
-  get: (key) =>
-    return if key? then @_params[key] else @_params
+  req.get = (key) -> return if key? then req.params[key] else req.params
 
   # Set params in request object
   # @param {String} `key` key-value's key
   # @param {String} `val` key-value's value
   # @param {Boolean} `force` ignore allowed keys
   # @return {Object} request object
-  set: (key, val, force = false) =>
-    aliasKey = Request.alias[key.toLowerCase()]
+  req.set = (key, val, force = false) ->
+    aliasKey = options.alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
 
-    if typeof Request.setters[key] is 'function'
-      return Request.setters[key].call(this, val)
+    if typeof options.setters[key] is 'function'
+      return options.setters[key].call(req, val)
 
     # Validators will filter the value and check for the returned value
-    _validator = Request.validators[key] or Request.validators['_general']
-    return this if _validator? and not _validator(val, key)
+    _validator = options.validators[key] or options.validators['_general']
+    return req if _validator? and not _validator(val, key)
 
-    @_params[key] = val if key in Request.allowedKeys or force
-    @[key] = val if key in Request.importKeys
-    return this
+    req.params[key] = val if key in options.allowedKeys or force
+    req[key] = val if key in options.importKeys
+    return req
 
   # Remove a property from params
-  remove: (keys...) =>
+  req.remove = (keys...) ->
     for key in keys
-      delete @_params[key]
-      delete @[key]
-    return @_params
+      delete req.params[key]
+      delete req[key]
+    true
 
-module.exports = Request
+  # Mix all params to one variable
+  _params = _.extend(
+    req.headers or {}
+    req.cookies or {}
+    req.params or {}
+    req.query or {}
+    req.body or {}
+    req.session or {}
+  )
+  req.params = {}
+  req.set(k, v) for k, v of _params
+  next()
+
+request.configer = (app, fn = ->) ->
+  fn.call(options, options)
+  app.use request
+
+module.exports = request
