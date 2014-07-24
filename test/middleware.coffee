@@ -1,42 +1,59 @@
 should = require 'should'
+express = require 'express'
+supertest = require 'supertest'
+
 ensure = require '../lib/middlewares/ensure'
 filter = require '../lib/middlewares/filter'
 select = require '../lib/middlewares/select'
-Request = require '../lib/request'
-Response = require '../lib/response'
+request = require '../lib/request'
+response = require '../lib/response'
 configer = require '../lib/configer'
 
 describe 'Middlewares#Ensure', ->
 
-  before -> Request.allowedKeys = ['name', 'lang']
+  app = express()
 
-  it 'should callback error when params not meet ensures', ->
-    req = new Request params: name: 'hi'
-    res = new Response
-    ensure req, res, 'name _sessionUserId', (err) -> should(err).not.eql null
+  before -> request.configer app, (req) -> req.allowedKeys = ['name', 'lang']
 
-  it 'should not callback error when meet all params', ->
-    req = new Request params: name: 'hi', lang: 'en'
-    res = new Response
-    ensure req, res, 'name lang', (err) -> should(err).eql null
+  it 'should callback error when params not meet ensures', (done) ->
+    app.use (req, res) ->
+      req.set 'name', 'hi'
+      ensure req, res, 'name _sessionUserId', (err) -> should(err).not.eql null
+      res.end 'ok'
 
-  after -> Request.allowedKeys = []
+    supertest(app).get('/').end done
+
+  it 'should not callback error when meet all params', (done) ->
+    app.use (req, res) ->
+      req.set 'name', 'hi'
+      req.set 'lang', 'en'
+      ensure req, res, 'name lang', (err) -> should(err).eql null
+      res.end 'ok'
+
+    supertest(app).get('/').end done
+
+  after -> request.configer app, (req) -> req.allowedKeys = []
 
 describe 'Middleware#Filter', ->
 
-  before -> Request.allowedKeys = ['name']
+  app = express()
 
-  it 'should callback error when use ensureMember filter', ->
-    req = new Request params: name: 'Grace'
-    res = new Response
-    filter.filters =
-      upper: (req, res, next) ->
-        req.set('name', req.get('name').toUpperCase())
-        next()
-    filter req, res, 'upper', (err) ->
-      req.get('name').should.eql 'GRACE'
+  before -> request.configer app, (req) -> req.allowedKeys = ['name']
 
-  after -> Request.allowedKeys = []
+  it 'should callback error when use ensureMember filter', (done) ->
+    app.use (req, res) ->
+      req.set 'name', 'Grace'
+      filter.filters =
+        upper: (req, res, next) ->
+          req.set('name', req.get('name').toUpperCase())
+          next()
+      filter req, res, 'upper', (err) ->
+        req.get('name').should.eql 'GRACE'
+      res.end 'ok'
+
+    supertest(app).get('/').end done
+
+  after -> request.configer app, (req) -> req.allowedKeys = []
 
 describe 'Middlewares#Select', ->
 
@@ -45,9 +62,7 @@ describe 'Middlewares#Select', ->
       id: '123'
       name: 'Grace'
       updatedAt: '2014-02-24T03:50:00.841Z'
-    req = new Request
-    res = new Response
-    select req, res, 'id updatedAt other', result, (err, result) ->
+    select {}, {}, 'id updatedAt other', result, (err, result) ->
       result.should.have.keys 'id', 'updatedAt'
 
   it 'should omit fields', ->
@@ -55,7 +70,5 @@ describe 'Middlewares#Select', ->
       name: 'Grace'
       password: '123456'
       updatedAt: '2014-02-24T03:50:00.841Z'
-    req = new Request
-    res = new Response
-    select req, res, '-password', result, (err, result) ->
+    select {}, {}, '-password', result, (err, result) ->
       result.should.have.keys 'name', 'updatedAt'
