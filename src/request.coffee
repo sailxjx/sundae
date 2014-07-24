@@ -30,13 +30,17 @@ class Request
     )
     @set(k, v) for k, v of params
 
+  # Get param in request object
+  # @param {String} key
+  # @return {Mixed} value
   get: (key) =>
     return if key? then @_params[key] else @_params
 
-  # Set Params in Request Object
-  # @param `key` key-value's key
-  # @param `val` key-value's value
-  # @param `force` ignore allowed keys
+  # Set params in request object
+  # @param {String} `key` key-value's key
+  # @param {String} `val` key-value's value
+  # @param {Boolean} `force` ignore allowed keys
+  # @return {Object} request object
   set: (key, val, force = false) =>
     aliasKey = Request.alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
@@ -44,10 +48,9 @@ class Request
     if typeof Request.setters[key] is 'function'
       return Request.setters[key].call(this, val)
 
-    # Validators will filter the value and set null to invalid values
+    # Validators will filter the value and check for the returned value
     _validator = Request.validators[key] or Request.validators['_general']
-    val = _validator(val, key) if _validator?
-    return @_params if val is null
+    return this if _validator? and not _validator(val, key)
 
     @_params[key] = val if key in Request.allowedKeys or force
     @[key] = val if key in Request.importKeys
