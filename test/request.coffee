@@ -10,7 +10,7 @@ describe 'Request', ->
   app = express()
 
   before ->
-    request.configer app, (req) ->
+    request.config app, (req) ->
       req.importKeys = ['_id']
       req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
       req.alias = address: 'location'
@@ -51,7 +51,7 @@ describe 'Request', ->
     supertest(app).get('/').end(done)
 
   after ->
-    request.configer app, (req) ->
+    request.config app, (req) ->
       req.importKeys = []
       req.allowedKeys = []
       req.alias = {}

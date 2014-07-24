@@ -1,5 +1,5 @@
 express = ->
 
-express.configer = (app, fn) ->
+express.config = (app, fn) ->
 
 module.exports = express

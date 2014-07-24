@@ -1,7 +1,10 @@
 path = require 'path'
 express = require 'express'
-configer = require './configer'
 middlewares = require './middlewares'
+request = require './request'
+response = require './response'
+router = require './router'
+backbone = require './backbone'
 
 class Sundae
 
@@ -15,10 +18,6 @@ class Sundae
     @_configs.push [key, fn]
     return this
 
-  use: (fn) ->
-    @_middlewares.push(fn)
-    return this
-
   # Give me a path
   # I'll deal everything for you
   scaffold: (mainPath) ->
@@ -28,7 +27,12 @@ class Sundae
     @config 'response', require path.join mainPath, 'config/response'
     @config 'routes', require path.join mainPath, 'config/routes'
     @config 'express', require path.join mainPath, 'config/express'
-    @use middlewares.ensure
+    @config 'backbone', (backbone) ->
+      backbone.middlewares = [
+        middlewares.ensure
+        middlewares.filter
+        middlewares.select
+      ]
     return this
 
   set: (key, val) ->
@@ -41,10 +45,14 @@ class Sundae
     app = express()
     for _config in @_configs
       [key, fn] = _config
-      configer[key]?(fn)
+      @[key]?.config? app, fn
     app.listen @_params['port'] or app.get('port') or 7000, callback
 
 sundae = new Sundae
 sundae.middlewares = middlewares
+sundae.request = request
+sundae.response = response
+sundae.router = router
+sundae.backbone = backbone
 
 module.exports = sundae

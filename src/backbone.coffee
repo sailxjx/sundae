@@ -2,8 +2,6 @@ async = require 'async'
 
 backbone = (req, res, callback) ->
 
-  sundae = require './sundae'
-
   {$ctrl, action, middlewares} = req
 
   async.waterfall [
@@ -15,7 +13,7 @@ backbone = (req, res, callback) ->
 
     # Call before middlewares
     (next) ->
-      async.eachSeries sundae._middlewares, (fn, next) ->
+      async.eachSeries backbone.middlewares, (fn, next) ->
         return next() unless fn.before
         key = $ctrl[action][fn.key] or $ctrl[action]
         if fn.parallel
@@ -34,7 +32,7 @@ backbone = (req, res, callback) ->
 
     # Call after middlewares
     (result, next) ->
-      async.reduce sundae._middlewares, result, (result, fn, next) ->
+      async.reduce backbone.middlewares, result, (result, fn, next) ->
         return next(null, result) unless fn.after
         key = $ctrl[action][fn.key] or $ctrl[action]
         if fn.parallel
@@ -45,8 +43,12 @@ backbone = (req, res, callback) ->
       , next
 
   ], (err, result) ->
-    res.set 'err', err
-    res.set 'result', result
+    res.err = err
+    res.result = result
     callback req, res
+
+backbone.config = (app, fn) -> fn.call backbone, backbone
+
+backbone.middlewares = []
 
 module.exports = backbone

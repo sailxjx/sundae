@@ -62,7 +62,7 @@ request = (req, res, next) ->
   req.set(k, v) for k, v of _params
   next()
 
-request.configer = (app, fn = ->) ->
+request.config = (app, fn = ->) ->
   fn.call(options, options)
   app.use request
 

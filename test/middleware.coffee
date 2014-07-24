@@ -7,13 +7,12 @@ filter = require '../lib/middlewares/filter'
 select = require '../lib/middlewares/select'
 request = require '../lib/request'
 response = require '../lib/response'
-configer = require '../lib/configer'
 
 describe 'Middlewares#Ensure', ->
 
   app = express()
 
-  before -> request.configer app, (req) -> req.allowedKeys = ['name', 'lang']
+  before -> request.config app, (req) -> req.allowedKeys = ['name', 'lang']
 
   it 'should callback error when params not meet ensures', (done) ->
     app.use (req, res) ->
@@ -32,13 +31,13 @@ describe 'Middlewares#Ensure', ->
 
     supertest(app).get('/').end done
 
-  after -> request.configer app, (req) -> req.allowedKeys = []
+  after -> request.config app, (req) -> req.allowedKeys = []
 
 describe 'Middleware#Filter', ->
 
   app = express()
 
-  before -> request.configer app, (req) -> req.allowedKeys = ['name']
+  before -> request.config app, (req) -> req.allowedKeys = ['name']
 
   it 'should callback error when use ensureMember filter', (done) ->
     app.use (req, res) ->
@@ -53,7 +52,7 @@ describe 'Middleware#Filter', ->
 
     supertest(app).get('/').end done
 
-  after -> request.configer app, (req) -> req.allowedKeys = []
+  after -> request.config app, (req) -> req.allowedKeys = []
 
 describe 'Middlewares#Select', ->
 

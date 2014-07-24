@@ -1,8 +1,6 @@
 _ = require 'lodash'
 async = require 'async'
 inflection = require 'inflection'
-Request = require './request'
-Response = require './response'
 backbone = require './backbone'
 p = require 'path'
 
@@ -52,7 +50,7 @@ class Router
   callback: (req, res) -> res.json()
 
   resource: (ctrl, options = {}) ->
-    map = @_resource(ctrl)
+    map = @resource(ctrl)
 
     {only, except} = options
     if only?
@@ -107,19 +105,14 @@ class Router
       path = '/' + p.join(@prefix, path)
 
     @app[method] path, (req, res) ->
-      _req = new Request req
-      _req.$ctrl = $ctrl
-      _req.ctrl = ctrl
-      _req.action = action
-      _req.middlewares = middlewares
-
-      _res = new Response res
-
-      backbone(_req, _res, callback)
+      req.$ctrl = $ctrl
+      req.ctrl = ctrl
+      req.action = action
+      req.middlewares = middlewares
+      backbone(req, res, callback)
 
 router = (app) -> new Router(app)
 
-router.configer = (app, fn) ->
-  fn? router(app)
+router.config = (app, fn) -> fn? router(app)
 
 module.exports = router

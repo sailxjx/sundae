@@ -9,7 +9,7 @@ describe 'Response', ->
 
   app = express()
 
-  before -> response.configer app, (res) -> res.parse = ->
+  before -> response.config app, (res) -> res.parse = ->
 
   it 'should patch the origin response object and add parse function', (done) ->
 
@@ -19,4 +19,4 @@ describe 'Response', ->
 
     supertest(app).get('/').end(done)
 
-  after -> response.configer app, (res) ->
+  after -> response.config app, (res) ->

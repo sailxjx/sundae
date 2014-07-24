@@ -1,11 +1,11 @@
-_configer = ->
+_config = ->
 
 response = (req, res, next) ->
-  _configer.call res, res
+  _config.call res, res
   next()
 
-response.configer = (app, fn = ->) ->
-  _configer = fn
+response.config = (app, fn = ->) ->
+  _config = fn
   app.use response
 
 module.exports = response
