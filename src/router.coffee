@@ -47,7 +47,8 @@ class Router
       options = path
     return options
 
-  callback: (req, res) -> res.json()
+  callback: (err, result) ->
+    @res.response(err, result)
 
   resource: (ctrl, options = {}) ->
     map = @resource(ctrl)
@@ -104,15 +105,28 @@ class Router
     if typeof path is 'string' and @prefix
       path = '/' + p.join(@prefix, path)
 
-    @app[method] path, (req, res) ->
+    @app[method] path, (req, res, next) ->
       req.$ctrl = $ctrl
       req.ctrl = ctrl
       req.action = action
       req.middlewares = middlewares
-      backbone(req, res, callback)
+      backbone req, res, (err, result) ->
+        @req = req
+        @res = res
+        callback.call this, err, result, next
+
+  http404: (req, res, next) ->
+    res.status(404).json message: 'Not Found'
+
+  http500: (err, req, res, next) ->
+    res.status(500).json error: err?.message or 'Internal Server Error'
 
 router = (app) -> new Router(app)
 
-router.config = (app, fn) -> fn? router(app)
+router.config = (app, fn) ->
+  _router = router(app)
+  fn? _router
+  app.use _router.http404
+  app.use _router.http500
 
 module.exports = router

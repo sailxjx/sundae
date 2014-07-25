@@ -15,8 +15,15 @@ describe 'Response', ->
 
     app.use (req, res) ->
       res.should.have.properties('parse')
-      res.json('ok')
 
-    supertest(app).get('/').end(done)
+      # Test for the bound response function
+      err = new Error('SOMETHING_WRONG')
+      err.toStatus = -> 500
+      err.toJSON = -> code: 500, message: err.message
+      res.response err
+
+    supertest(app).get('/').end (err, res) ->
+      res.body.should.have.properties 'code', 'message'
+      done()
 
   after -> response.config app, (res) ->

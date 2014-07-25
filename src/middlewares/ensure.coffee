@@ -1,6 +1,9 @@
 # Ensure declared params
 # Or response error messages when miss some param
-Err = require 'err1st'
+try
+  Err = require 'err1st'
+catch e
+  Err = Error
 
 ensure = (req, res, ensures, callback) ->
   ensures = ensures.split new RegExp(' +') if toString.call(ensures) is '[object String]'

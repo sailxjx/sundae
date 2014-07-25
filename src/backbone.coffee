@@ -42,10 +42,7 @@ backbone = (req, res, callback) ->
           fn req, res, key, result, next
       , next
 
-  ], (err, result) ->
-    res.err = err
-    res.result = result
-    callback req, res
+  ], callback
 
 backbone.config = (app, fn) -> fn.call backbone, backbone
 
