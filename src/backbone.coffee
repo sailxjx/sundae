@@ -44,7 +44,10 @@ backbone = (req, res, callback) ->
 
   ], callback
 
-backbone.config = (app, fn) -> fn.call backbone, backbone
+backbone.config = (app, fn) ->
+  fn.call backbone, backbone
+  for middleware in backbone.middlewares
+    middleware.initialize?()
 
 backbone.middlewares = []
 
