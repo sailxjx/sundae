@@ -1,14 +1,13 @@
 path = require 'path'
 express = require 'express'
-middlewares = require './middlewares'
+decorators = require './decorators'
 
 class Sundae
 
   constructor: ->
     @_configs = []
     @_params = {}
-    @_middlewares = []
-    @middlewares = middlewares
+    @decorators = decorators
     # Load components
     @request = require './request'
     @response = require './response'
@@ -32,10 +31,10 @@ class Sundae
     @config 'database'
     @config 'router'
     @config 'backbone', (backbone) ->
-      backbone.middlewares = [
-        middlewares.ensure
-        middlewares.filter
-        middlewares.select
+      backbone.decorators = [
+        decorators.ensure
+        decorators.filter
+        decorators.select
       ]
     return this
 

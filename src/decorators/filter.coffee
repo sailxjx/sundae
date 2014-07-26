@@ -22,7 +22,7 @@ filter.initialize = ->
   sundae = require '../sundae'
   try
     if _.isEmpty(filter.filters)
-      filter.filters = require sundae.get('mainPath'), 'middlewares', 'filters'
+      filter.filters = require sundae.get('mainPath'), 'decorators', 'filters'
   catch e
 
 module.exports = filter

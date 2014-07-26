@@ -1,4 +1,4 @@
-# Select middleware filter the select fields
+# Select decorator filter the select fields
 _ = require 'lodash'
 
 select = (req, res, fields, result, callback = ->) ->

@@ -11,9 +11,9 @@ backbone = (req, res, callback) ->
         fn req, res, next
       , next
 
-    # Call before middlewares
+    # Call before decorators
     (next) ->
-      async.eachSeries backbone.middlewares, (fn, next) ->
+      async.eachSeries backbone.decorators, (fn, next) ->
         return next() unless fn.before
         key = $ctrl[action][fn.key] or $ctrl[action]
         if fn.parallel
@@ -30,9 +30,9 @@ backbone = (req, res, callback) ->
       else
         $ctrl[action] req, next
 
-    # Call after middlewares
+    # Call after decorators
     (result, next) ->
-      async.reduce backbone.middlewares, result, (result, fn, next) ->
+      async.reduce backbone.decorators, result, (result, fn, next) ->
         return next(null, result) unless fn.after
         key = $ctrl[action][fn.key] or $ctrl[action]
         if fn.parallel
@@ -46,9 +46,9 @@ backbone = (req, res, callback) ->
 
 backbone.config = (app, fn) ->
   fn.call backbone, backbone
-  for middleware in backbone.middlewares
-    middleware.initialize?()
+  for decorator in backbone.decorators
+    decorator.initialize?()
 
-backbone.middlewares = []
+backbone.decorators = []
 
 module.exports = backbone

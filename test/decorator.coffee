@@ -2,9 +2,9 @@ should = require 'should'
 express = require 'express'
 supertest = require 'supertest'
 
-ensure = require '../lib/middlewares/ensure'
-filter = require '../lib/middlewares/filter'
-select = require '../lib/middlewares/select'
+ensure = require '../lib/decorators/ensure'
+filter = require '../lib/decorators/filter'
+select = require '../lib/decorators/select'
 request = require '../lib/request'
 response = require '../lib/response'
 
