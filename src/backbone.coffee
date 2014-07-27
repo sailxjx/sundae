@@ -3,6 +3,7 @@ async = require 'async'
 backbone = (req, res, callback) ->
 
   {$ctrl, action, middlewares} = req
+  decorators = $ctrl.decorators or []
 
   async.waterfall [
     # Load route level middlewares
@@ -13,7 +14,7 @@ backbone = (req, res, callback) ->
 
     # Call before decorators
     (next) ->
-      async.eachSeries backbone.decorators, (fn, next) ->
+      async.eachSeries decorators, (fn, next) ->
         return next() unless fn.before
         key = $ctrl[action][fn.key] or $ctrl[action]
         if fn.parallel
@@ -32,7 +33,7 @@ backbone = (req, res, callback) ->
 
     # Call after decorators
     (result, next) ->
-      async.reduce backbone.decorators, result, (result, fn, next) ->
+      async.reduce decorators, result, (result, fn, next) ->
         return next(null, result) unless fn.after
         key = $ctrl[action][fn.key] or $ctrl[action]
         if fn.parallel
@@ -43,12 +44,5 @@ backbone = (req, res, callback) ->
       , next
 
   ], callback
-
-backbone.config = (app, fn) ->
-  fn.call backbone, backbone
-  for decorator in backbone.decorators
-    decorator.initialize?()
-
-backbone.decorators = []
 
 module.exports = backbone

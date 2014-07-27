@@ -1,18 +1,19 @@
 path = require 'path'
 express = require 'express'
-decorators = require './decorators'
 
 class Sundae
 
   constructor: ->
     @_configs = []
     @_params = {}
-    @decorators = decorators
     # Load components
     @request = require './request'
     @response = require './response'
     @router = require './router'
     @backbone = require './backbone'
+    @BaseController = require './controller'
+    @BaseHelper = require './helper'
+    @BaseMailer = require './mailer'
     # Set main directory of application
     @set 'mainPath', path.join(process.cwd(), 'app')
 
@@ -30,12 +31,6 @@ class Sundae
     @config 'response'
     @config 'database'
     @config 'router'
-    @config 'backbone', (backbone) ->
-      backbone.decorators = [
-        decorators.ensure
-        decorators.filter
-        decorators.select
-      ]
     return this
 
   set: (key, val) ->

@@ -9,20 +9,19 @@ filter = (req, res, list, callback) ->
   list = list.split new RegExp(' +') if toString.call(list) is '[object String]'
   return callback null unless toString.call(list) is '[object Array]'
 
+  {$ctrl} = req
+
   async.eachSeries list, (method, next) ->
-    filter.filters[method](req, res, next)
+    fn = $ctrl[method]
+    return next() unless typeof fn is 'function'
+    if fn.length is 3
+      fn.call $ctrl, req, res, next
+    else
+      fn.call $ctrl, req, next
   , callback
 
-filter.filters = {}
 filter.before = true
 filter.key = 'filters'
 filter.parallel = false
-
-filter.initialize = ->
-  sundae = require '../sundae'
-  try
-    if _.isEmpty(filter.filters)
-      filter.filters = require sundae.get('mainPath'), 'decorators', 'filters'
-  catch e
 
 module.exports = filter

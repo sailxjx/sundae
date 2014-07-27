@@ -11,7 +11,6 @@ Sundae is a light weight api framework based on express, but more intesting than
 
 # TODO
 * [ ] add testcases for router and backbone
-* [ ] find an elegant way to load middlewares and dependencies
 * [ ] add cli commands
 
 [npm-url]: https://npmjs.org/package/sundae
