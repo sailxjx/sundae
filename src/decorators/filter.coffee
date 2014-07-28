@@ -9,15 +9,15 @@ filter = (req, res, list, callback) ->
   list = list.split new RegExp(' +') if toString.call(list) is '[object String]'
   return callback null unless toString.call(list) is '[object Array]'
 
-  {$ctrl} = req
+  {_ctrl} = req
 
   async.eachSeries list, (method, next) ->
-    fn = $ctrl[method]
+    fn = _ctrl[method]
     return next() unless typeof fn is 'function'
     if fn.length is 3
-      fn.call $ctrl, req, res, next
+      fn.call _ctrl, req, res, next
     else
-      fn.call $ctrl, req, next
+      fn.call _ctrl, req, next
   , callback
 
 filter.before = true

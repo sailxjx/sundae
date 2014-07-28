@@ -2,7 +2,8 @@ _config = ->
 
 response = (req, res, next) ->
 
-  res.response = (err, result) ->
+  res.response = ->
+    {err, result} = res
     if err?
       res.status(err.toStatus?() or 400).json err.toJSON?() or message: err.message
     else

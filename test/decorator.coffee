@@ -42,7 +42,7 @@ describe 'Middleware#Filter', ->
   it 'should callback error when use ensureMember filter', (done) ->
     app.use (req, res) ->
       req.set 'name', 'Grace'
-      req.$ctrl =
+      req._ctrl =
         upper: (req, res, next) ->
           req.set('name', req.get('name').toUpperCase())
           next()

@@ -47,11 +47,10 @@ class Router
       options = path
     return options
 
-  callback: (err, result) ->
-    @res.response(err, result)
+  callback: (req, res) -> res.response()
 
   resource: (ctrl, options = {}) ->
-    map = @resource(ctrl)
+    map = @_resource(ctrl)
 
     {only, except} = options
     if only?
@@ -99,21 +98,18 @@ class Router
     action or= 'index'
 
     sundae = require './sundae'
-    $ctrl = require p.join sundae.get('mainPath'), "controllers/#{ctrl}"
-    return false unless typeof $ctrl[action] is 'function'
+    _ctrl = require p.join sundae.get('mainPath'), "controllers/#{ctrl}"
+    return false unless typeof _ctrl[action] is 'function'
 
-    if typeof path is 'string' and @prefix
+    if toString.call(path) is '[object String]' and @prefix
       path = '/' + p.join(@prefix, path)
 
     @app[method] path, (req, res, next) ->
-      req.$ctrl = $ctrl
+      req._ctrl = _ctrl
       req.ctrl = ctrl
       req.action = action
       req.middlewares = middlewares
-      backbone req, res, (err, result) ->
-        @req = req
-        @res = res
-        callback.call this, err, result, next
+      backbone req, res, callback
 
   http404: (req, res, next) ->
     res.status(404).json message: 'Not Found'

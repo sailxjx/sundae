@@ -2,8 +2,8 @@ async = require 'async'
 
 backbone = (req, res, callback) ->
 
-  {$ctrl, action, middlewares} = req
-  decorators = $ctrl.decorators or []
+  {_ctrl, action, middlewares} = req
+  decorators = _ctrl.decorators or []
 
   async.waterfall [
     # Load route level middlewares
@@ -16,7 +16,7 @@ backbone = (req, res, callback) ->
     (next) ->
       async.eachSeries decorators, (fn, next) ->
         return next() unless fn.before
-        key = $ctrl[action][fn.key] or $ctrl[action]
+        key = _ctrl[action][fn.key] or _ctrl[action]
         if fn.parallel
           fn req, res, key
           next()
@@ -26,16 +26,16 @@ backbone = (req, res, callback) ->
 
     # Call controller action
     (next) ->
-      if $ctrl[action].length is 3
-        $ctrl[action] req, res, next
+      if _ctrl[action].length is 3
+        _ctrl[action] req, res, next
       else
-        $ctrl[action] req, next
+        _ctrl[action] req, next
 
     # Call after decorators
     (result, next) ->
       async.reduce decorators, result, (result, fn, next) ->
         return next(null, result) unless fn.after
-        key = $ctrl[action][fn.key] or $ctrl[action]
+        key = _ctrl[action][fn.key] or _ctrl[action]
         if fn.parallel
           fn req, res, key, result
           next null, result
@@ -43,6 +43,9 @@ backbone = (req, res, callback) ->
           fn req, res, key, result, next
       , next
 
-  ], callback
+  ], (err, result) ->
+    res.err = err
+    res.result = result
+    callback req, res
 
 module.exports = backbone

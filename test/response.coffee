@@ -20,7 +20,8 @@ describe 'Response', ->
       err = new Error('SOMETHING_WRONG')
       err.toStatus = -> 500
       err.toJSON = -> code: 500, message: err.message
-      res.response err
+      res.err = err
+      res.response()
 
     supertest(app).get('/').end (err, res) ->
       res.body.should.have.properties 'code', 'message'
