@@ -1,2 +1,7 @@
 sundae = require 'sundae'
-sundae.scaffold(__dirname).run -> console.log 'Sundae server listen on 7000'
+sundae.set('port', 7000).scaffold(__dirname).run ->
+  console.log '''
+    Server started!
+    Now visit http://localhost:7000
+    To see the welcome message
+  '''

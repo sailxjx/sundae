@@ -30,11 +30,11 @@ cli =
   pass: (msg) -> console.log "  \u001b[32mPASS:\u001b[39m #{msg}"
 
   fail: (msg) ->
-    console.error "  \u001b[32mFAIL:\u001b[39m #{msg}"
+    console.error "  \u001b[31mFAIL:\u001b[39m #{msg}"
     process.exit(0)
 
   succ: (msg) ->
-    console.log "  \u001b[31mSUCC:\u001b[39m #{msg}"
+    console.log "  \u001b[32mSUCC:\u001b[39m #{msg}"
     process.exit(1)
 
 commander
