@@ -3,6 +3,23 @@ _ = require 'lodash'
 
 # Expand express request object
 request.config = (app, fn = ->) ->
+  # Keys will import as request properties
+  request.importKeys = []
+
+  # Keys allowed in `set` function
+  request.allowedKeys = []
+
+  # Alias keys will be converted to the value key
+  # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
+  # Keys should be lowercase
+  request.alias = {}
+
+  # Validator for each key, value will be dropped if validator returns false
+  request.validators = {}
+
+  # Custom setter for specific key
+  request.setters = {}
+
   # Get param in request object
   # @param {String} key
   # @return {Mixed} value

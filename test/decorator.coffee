@@ -8,7 +8,7 @@ select = require '../lib/decorators/select'
 request = require '../lib/request'
 response = require '../lib/response'
 
-describe 'Middlewares#Ensure', ->
+describe 'Decorators#Ensure', ->
 
   app = express()
 
@@ -33,7 +33,7 @@ describe 'Middlewares#Ensure', ->
 
   after -> request.config app, (req) -> req.allowedKeys = []
 
-describe 'Middleware#Filter', ->
+describe 'Decorators#Filter', ->
 
   app = express()
 
@@ -54,7 +54,7 @@ describe 'Middleware#Filter', ->
 
   after -> request.config app, (req) -> req.allowedKeys = []
 
-describe 'Middlewares#Select', ->
+describe 'Decorators#Select', ->
 
   it 'should pick fields and ignore others', ->
     result =

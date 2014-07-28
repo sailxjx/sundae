@@ -115,7 +115,7 @@ class Router
     res.status(404).json message: 'Not Found'
 
   http500: (err, req, res, next) ->
-    res.status(500).json error: err?.message or 'Internal Server Error'
+    res.status(500).json message: err?.message or 'Internal Server Error'
 
 router = (app) -> new Router(app)
 

@@ -4,6 +4,7 @@ backbone = (req, res, callback) ->
 
   {_ctrl, action, middlewares} = req
   decorators = _ctrl.decorators or []
+  middlewares or= []
 
   async.waterfall [
     # Load route level middlewares

@@ -53,12 +53,22 @@ class Sundae
     try
       fn or= require path.join @get('mainPath'), 'config', _key
     catch e
-    loader?.config?(@app, fn) or fn(@app) if typeof fn is 'function'
+    (fn = ->) unless typeof fn is 'function'
+    loader?.config?(@app, fn) or fn(@app)
 
-  run: (callback = ->) ->
+  # Init the app instance
+  init: ->
     app = @app = express()
     @_config(key, fn) for [key, fn] in @_configs
-    app.listen @_params['port'] or app.get('port') or 7000, callback
+    return this
+
+  # Bind to the port
+  listen: (callback = ->) ->
+    @init() unless @app
+    @app.listen @_params['port'] or @app.get('port') or 7000, callback
+
+  # Alias of sundae.init().listen()
+  run: (callback = ->) -> @init().listen callback
 
 sundae = new Sundae
 
