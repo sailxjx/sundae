@@ -1,10 +1,13 @@
 {
   "name": "sundae",
   "version": "0.0.3",
-  "description": "Real-time Web Framework",
+  "description": "Rtf restful framework for node",
   "main": "index.js",
   "scripts": {
     "test": "make test"
+  },
+  "bin": {
+    "sundae": "./bin/sundae"
   },
   "repository": {
     "type": "git",
@@ -13,8 +16,7 @@
   "keywords": [
     "web",
     "framework",
-    "express",
-    "socket"
+    "express"
   ],
   "author": "sailxjx",
   "license": {
@@ -25,20 +27,18 @@
     "url": "https://github.com/sailxjx/sundae/issues"
   },
   "devDependencies": {
-    "should": "~2.0.2",
-    "cake-dog": "~0.2.1",
-    "mocha": "~1.13.0",
-    "docco": "~0.6.2",
-    "coffee-script": "~1.6.3"
+    "should": "^4.0.4",
+    "coffee-script": "^1.7.1",
+    "mocha": "^1.20.1",
+    "supertest": "^0.13.0"
   },
   "dependencies": {
-    "lodash": "~2.2.1",
-    "socket.io": "~0.9.16",
-    "async": "~0.2.9",
-    "graceful-logger": "~0.1.2",
-    "connect-coffee-script": "~0.1.6",
-    "stylus": "~0.39.2",
-    "express": "~3.4.4",
-    "jade": "~0.35.0"
+    "async": "^0.9.0",
+    "lodash": "^2.4.1",
+    "express": "^4.5.1",
+    "inflection": "^1.3.8",
+    "shelljs": "^0.3.0",
+    "commander": "^2.3.0",
+    "graceful-logger": "^0.4.1"
   }
 }

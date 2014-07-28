@@ -1,14 +1,20 @@
 sundae
 ======
 
-Real-time Web Framework
+Rtf restful framework for node
 
-[![build status](https://api.travis-ci.org/sailxjx/sundae.png)](https://travis-ci.org/sailxjx/sundae)
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
 # Intro
 
-Sundae is a full-stack framework that will help you focus on building your application.
+Sundae is a light weight api framework based on express, but more intesting than express.
 
-# Design Philosophy
+# TODO
+* [ ] error handler support
+* [ ] add cli commands
 
-No Philosophy is Good Philosophy :smile:
+[npm-url]: https://npmjs.org/package/sundae
+[npm-image]: http://img.shields.io/npm/v/sundae.svg
+
+[travis-url]: https://travis-ci.org/sailxjx/sundae
+[travis-image]: http://img.shields.io/travis/sailxjx/sundae.svg

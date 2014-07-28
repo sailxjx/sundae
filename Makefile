@@ -1,6 +1,8 @@
-default: test
+all: test
 
 test:
-	@./node_modules/.bin/mocha --reporter spec --compilers coffee:coffee-script test/helper.coffee
+	@NODE_ENV=mocha ./node_modules/.bin/mocha 	\
+	    --require should 				\
+	    --reporter spec test/index.js
 
-.PHONY: test
+.PHONY: all test

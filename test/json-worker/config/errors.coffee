@@ -1,3 +1,0 @@
-errors = ->
-
-module.exports = errors
