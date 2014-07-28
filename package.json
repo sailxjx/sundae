@@ -6,6 +6,9 @@
   "scripts": {
     "test": "make test"
   },
+  "bin": {
+    "sundae": "./bin/sundae"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sailxjx/sundae"
@@ -35,6 +38,7 @@
     "express": "^4.5.1",
     "inflection": "^1.3.8",
     "shelljs": "^0.3.0",
-    "commander": "^2.3.0"
+    "commander": "^2.3.0",
+    "graceful-logger": "^0.4.1"
   }
 }
