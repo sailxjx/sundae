@@ -11,7 +11,11 @@ Sundae is a light weight api framework based on express, but more intesting than
 
 # TODO
 * [ ] error handler support
-* [ ] add cli commands
+
+# Changelog
+
+## v0.1.0
+* new beginning of sundae framework
 
 [npm-url]: https://npmjs.org/package/sundae
 [npm-image]: http://img.shields.io/npm/v/sundae.svg
