@@ -125,4 +125,6 @@ router.config = (app, fn) ->
   app.use _router.http404
   app.use _router.http500
 
+router.key = 'routes'
+
 module.exports = router

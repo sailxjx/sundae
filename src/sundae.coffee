@@ -42,13 +42,18 @@ class Sundae
   get: (key) -> @_params[key]
 
   # Apply config functions
-  # Undefined functions will auto loaded by the same name in config directory
+  # If the loader is not exist, fn will be call with a single app param
+  # Undefined functions will auto loaded by the key name defined in the loader.key
+  # Or use the same name of loader
+  # @param {String} `key` loader name
+  # @param {Function} `fn` configration function
   _config: (key, fn) ->
+    loader = @[key]
+    _key = loader?.key or key
     try
-      fn or= require path.join @get('mainPath'), 'config', key
+      fn or= require path.join @get('mainPath'), 'config', _key
     catch e
-
-    @[key]?.config?(@app, fn) or fn(@app) if typeof fn is 'function'
+    loader?.config?(@app, fn) or fn(@app) if typeof fn is 'function'
 
   run: (callback = ->) ->
     app = @app = express()
