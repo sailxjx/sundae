@@ -12,7 +12,7 @@ cli.fail = (msg) ->
   return new Error(msg)
 
 cli.succ = (msg) ->
-  console.log "  \u001b[32mSUCC:\u001b[39m finish"
+  console.log "  \u001b[32mSUCC:\u001b[39m #{msg}"
   return true
 
 describe 'Cli#Init', ->
@@ -24,8 +24,8 @@ describe 'Cli#Init', ->
     cli.init(__dirname).message.should.containEql 'exist'
 
 
-  # it 'should init the application in app directory', ->
+  it 'should init the application in app directory', ->
 
-  #   cli.init(path.join(__dirname, 'app')).should.eql true
+    cli.init(path.join(__dirname, 'app')).should.eql true
 
   after clean

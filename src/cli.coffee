@@ -24,6 +24,11 @@ cli =
     sh.cd mainPath
     return cli.fail msg unless sh.exec('npm install').code is 0
     cli.pass msg
+    cli.succ """
+      checkout the #{path.basename(mainPath)} directory
+      and use `coffee app.coffee` to execute your application.
+      certainly you can compile your code to .js
+    """
 
   exec: (msg) -> console.log "  \u001b[36mEXEC:\u001b[39m #{msg}"
 
@@ -43,7 +48,7 @@ commander
   .usage '[app]'
   .action (app) ->
     app = '' unless toString.call(app) is '[object String]'
-    _init path.resolve(app)
+    cli.init path.resolve(app)
 
 commander.parse(process.argv)
 
