@@ -5,6 +5,8 @@ supertest = require 'supertest'
 ensure = require '../lib/decorators/ensure'
 filter = require '../lib/decorators/filter'
 select = require '../lib/decorators/select'
+assembler = require '../lib/decorators/assembler'
+post = require '../lib/decorators/post'
 request = require '../lib/request'
 response = require '../lib/response'
 
@@ -54,6 +56,23 @@ describe 'Decorators#Filter', ->
 
   after -> request.config app, (req) -> req.allowedKeys = []
 
+describe 'Decorators#Assembler', ->
+
+  it 'should call the assembler function and get a new property', (done) ->
+    app = express()
+    app.use (req, res) ->
+      req._ctrl =
+        isNew: (req, result, callback) ->
+          result.isNew = true
+          callback()
+      assembler req, res, 'isNew', {}, (err, result) ->
+        result.should.have.properties 'isNew'
+      # also work when result is array
+      assembler req, res, 'isNew', [{}, {}], (err, results) ->
+        results.forEach (result) -> result.should.have.properties 'isNew'
+      res.end 'ok'
+    supertest(app).get('/').end done
+
 describe 'Decorators#Select', ->
 
   it 'should pick fields and ignore others', ->
@@ -71,3 +90,25 @@ describe 'Decorators#Select', ->
       updatedAt: '2014-02-24T03:50:00.841Z'
     select {}, {}, '-password', result, (err, result) ->
       result.should.have.keys 'name', 'updatedAt'
+
+describe 'Decorators#Post', ->
+
+  it 'should parallel execute post function', (done) ->
+    app = express()
+    app.use (req, res) ->
+      changeable = 0
+
+      fn = (req, res, result) ->
+        setTimeout ->
+          changeable += 1
+          changeable.should.eql 2
+          res.end 'ok'
+        , 20
+
+      post req, res, fn
+
+      setTimeout ->
+        changeable += 1
+      , 10
+
+    supertest(app).get('/').end done
