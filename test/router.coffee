@@ -38,7 +38,7 @@ describe 'Router', ->
 
       _router = router(app)
 
-      _router.callback  = (req, res) -> res.json res.result
+      _router.callback = (req, res) -> res.json res.result
 
       _router.get '/users/special', to: 'user#special'
 
@@ -51,3 +51,13 @@ describe 'Router', ->
         res.body.ok.should.eql 1
         done err
 
+  describe 'Router#LoadCtrl', ->
+
+    it 'should mix the controller methods with mixers', ->
+
+      app = express()
+
+      _router = router(app)
+
+      _ctrl = _router._loadCtrl 'user'
+      _ctrl.should.have.properties 'gender', 'signin'

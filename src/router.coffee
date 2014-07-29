@@ -7,6 +7,7 @@ p = require 'path'
 class Router
 
   constructor: (@app) ->
+    @_controllers = {}
 
   middlewares: []
 
@@ -91,14 +92,37 @@ class Router
     options.method = 'options'
     @_apply(options)
 
+  # Load and cache controllers
+  _loadCtrl: (ctrl) ->
+    unless @_controllers[ctrl]
+      # Let it crash if controller not found
+      sundae = require './sundae'
+      _mainPath = sundae.get('mainPath')
+      _ctrl = require p.join _mainPath, "controllers/#{ctrl}"
+
+      # Load mixers
+      mixers = _ctrl.mixers or ctrl
+      mixers = mixers.split new RegExp(' +') if toString.call(mixers) is '[object String]'
+      mixers.unshift ctrl if mixers.indexOf(ctrl) is -1
+      for mixer in mixers
+        try
+          mixer = require p.join _mainPath, "mixers/#{mixer}"
+          for key, fn of mixer
+            if not _ctrl[key]? and typeof fn is 'function'
+              _ctrl[key] = -> fn.apply _ctrl, arguments
+        catch e
+
+      # Cache controller
+      @_controllers[ctrl] = _ctrl
+    return @_controllers[ctrl]
+
   _apply: (options = {}) ->
     {ctrl, action, method, path, middlewares, callback} = options
     middlewares or= @middlewares
     callback or= @callback
     action or= 'index'
 
-    sundae = require './sundae'
-    _ctrl = require p.join sundae.get('mainPath'), "controllers/#{ctrl}"
+    _ctrl = @_loadCtrl ctrl
     return false unless typeof _ctrl[action] is 'function'
 
     if toString.call(path) is '[object String]' and @prefix
