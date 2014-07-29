@@ -17,7 +17,7 @@ backbone = (req, res, callback) ->
     (next) ->
       async.eachSeries decorators, (fn, next) ->
         return next() unless fn.before
-        key = _ctrl[action][fn.key] or _ctrl[action]
+        key = _ctrl[action][fn.key] or _ctrl[fn.key]
         if fn.parallel
           fn req, res, key
           next()
@@ -36,7 +36,7 @@ backbone = (req, res, callback) ->
     (result, next) ->
       async.reduce decorators, result, (result, fn, next) ->
         return next(null, result) unless fn.after
-        key = _ctrl[action][fn.key] or _ctrl[action]
+        key = _ctrl[action][fn.key] or _ctrl[fn.key]
         if fn.parallel
           fn req, res, key, result
           next null, result
