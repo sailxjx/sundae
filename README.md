@@ -10,7 +10,6 @@ Rtf restful framework for node
 Sundae is a light weight api framework based on express, but more intesting than express.
 
 # TODO
-* [ ] error handler support
 
 # Changelog
 ## v0.1.1
