@@ -23,7 +23,7 @@ request.config = (app, fn = ->) ->
   # Get param in request object
   # @param {String} key
   # @return {Mixed} value
-  request.get = (key) -> return if key? then @params[key] else @params
+  request.get = (key) -> return if key? then @_params[key] else @_params
 
   # Set params in request object
   # @param {String} `key` key-value's key
@@ -41,14 +41,14 @@ request.config = (app, fn = ->) ->
     _validator = @validators[key] or @validators['_general']
     return this if _validator? and not _validator(val, key)
 
-    @params[key] = val if key in @allowedKeys or force
+    @_params[key] = val if key in @allowedKeys or force
     @[key] = val if key in @importKeys
     return this
 
   # Remove a property from params
   request.remove = (keys...) ->
     for key in keys
-      delete @params[key]
+      delete @_params[key]
       delete @[key]
     true
 
@@ -65,7 +65,7 @@ request.config = (app, fn = ->) ->
       req.body or {}
       req.session or {}
     )
-    req.params = {}
+    req._params = {}
     req.set(k, v) for k, v of _params
     next()
 

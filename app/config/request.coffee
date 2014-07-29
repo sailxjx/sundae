@@ -4,7 +4,7 @@ module.exports = (req) ->
   req.importKeys = []
 
   # Keys allowed in `set` function
-  req.allowedKeys = []
+  req.allowedKeys = ['user-agent']
 
   # Alias keys will be converted to the value key
   # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}

@@ -14,6 +14,8 @@ Sundae is a light weight api framework based on express, but more intesting than
 
 # Changelog
 ## v0.1.1
+* add more comments in demo controllers
+* fix request reset params bug
 * fix cli init crash
 
 ## v0.1.0
