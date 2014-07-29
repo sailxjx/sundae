@@ -15,6 +15,7 @@ backbone = (req, res, callback) ->
 
     # Call before decorators
     (next) ->
+      # console.log _ctrl
       async.eachSeries decorators, (fn, next) ->
         return next() unless fn.before
         key = _ctrl[action][fn.key] or _ctrl[fn.key]

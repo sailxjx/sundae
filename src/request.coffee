@@ -23,7 +23,9 @@ request.config = (app, fn = ->) ->
   # Get param in request object
   # @param {String} key
   # @return {Mixed} value
-  request.get = (key) -> return if key? then @_params[key] else @_params
+  request.get = (key) ->
+    @_params = {} unless @_params?
+    return if key? then @_params[key] else @_params
 
   # Set params in request object
   # @param {String} `key` key-value's key
@@ -31,6 +33,7 @@ request.config = (app, fn = ->) ->
   # @param {Boolean} `force` ignore allowed keys
   # @return {Object} request object
   request.set = (key, val, force = false) ->
+    @_params = {} unless @_params?
     aliasKey = @alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
 
@@ -53,20 +56,5 @@ request.config = (app, fn = ->) ->
     true
 
   fn.call request, request
-
-  # Load request middleware
-  app.use (req, res, next) ->
-    # Mix all params to one variable
-    _params = _.extend(
-      req.headers or {}
-      req.cookies or {}
-      req.params or {}
-      req.query or {}
-      req.body or {}
-      req.session or {}
-    )
-    req._params = {}
-    req.set(k, v) for k, v of _params
-    next()
 
 module.exports = request

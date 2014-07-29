@@ -129,6 +129,17 @@ class Router
       path = '/' + p.join(@prefix, path)
 
     @app[method] path, (req, res, next) ->
+      # Mix all params to one variable
+      _params = _.extend(
+        req.headers or {}
+        req.cookies or {}
+        req.params or {}
+        req.query or {}
+        req.body or {}
+        req.session or {}
+      )
+      req._params = {}
+      req.set(k, v) for k, v of _params
       req._ctrl = _ctrl
       req.ctrl = ctrl
       req.action = action
