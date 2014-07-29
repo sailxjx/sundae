@@ -17,6 +17,8 @@ cli.succ = (msg) ->
 
 describe 'Cli#Init', ->
 
+  @timeout 30000
+
   before clean
 
   it 'should check the target directory and throw error when target is not empty', ->
