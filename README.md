@@ -34,6 +34,7 @@ Sundae is a light weight api framework based on express, but more intesting than
 # Changelog
 ## v0.1.3
 * add assembler, post decorators
+* fix mixer loader
 
 ## v0.1.2
 * auto load mixers

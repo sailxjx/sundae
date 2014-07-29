@@ -108,8 +108,9 @@ class Router
         try
           mixer = require p.join _mainPath, "mixers/#{mixer}"
           for key, fn of mixer
-            if not _ctrl[key]? and typeof fn is 'function'
-              _ctrl[key] = -> fn.apply _ctrl, arguments
+            do (key, fn) ->
+              if not _ctrl[key]? and typeof fn is 'function'
+                _ctrl[key] = -> fn.apply _ctrl, arguments
         catch e
 
       # Cache controller

@@ -23,6 +23,9 @@ class HomeController extends ApplicationController
   # We'll filter the useless key of the callback data
   @::index.select = '-useless'
 
+  # This assembler function is declared in home mixer
+  @::index.assemblers = 'changeName'
+
   # This is a filter function looks like controller actions
   # You can call this function from router
   # But most time you shouldn't do this
