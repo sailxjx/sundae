@@ -2,62 +2,60 @@ should = require 'should'
 express = require 'express'
 supertest = require 'supertest'
 router = require '../lib/router'
+request = require '../lib/request'
+response = require '../lib/response'
 sundae = require '../lib/sundae'
 
 describe 'Router', ->
 
+  app = express()
+
+  request.config app
+
+  response.config app
+
+  router = new router.Router
+
+  router.app = app
+
+  router.callback = (req, res) -> res.json res.result
+
   # Tell sundae where to load the application
-  before -> sundae.set 'mainPath', __dirname
+  sundae.set 'mainPath', __dirname
 
-  describe 'Router#Resource', ->
+  it 'should register the user resource and initial the routes of user', (done) ->
 
-    it 'should register the user resource and initial the routes of user', (done) ->
+    router.resource 'user', only: ['read']
 
-      app = express()
+    app._router.stack.some (route) ->
+      return false unless _route = route?.route
+      _route.path is '/users'
+    .should.eql true
 
-      _router = router(app)
+    supertest(app).get('/users').end (err, res) ->
+      res.body.forEach (user) -> user.should.have.properties 'name'
+      done err
 
-      _router.callback = (req, res) -> res.json res.result
+  it 'should register the user.special function', (done) ->
 
-      _router.resource 'user', only: ['read']
+    router.get '/users/special', to: 'user#special'
 
-      app._router.stack.some (route) ->
-        return false unless _route = route?.route
-        _route.path is '/users'
-      .should.eql true
+    app._router.stack.some (route) ->
+      return false unless _route = route?.route
+      _route.path is '/users/special' and _route.methods.get is true
+    .should.eql true
 
-      supertest(app).get('/users').end (err, res) ->
-        res.body.forEach (user) -> user.should.have.properties 'name'
-        done err
+    supertest(app).get('/users/special').end (err, res) ->
+      res.body.ok.should.eql 1
+      done err
 
-  describe 'Router#Get', ->
+  it 'should mix the controller methods with mixers', ->
 
-    it 'should register the user.special function', (done) ->
+    _ctrl = router._loadCtrl 'user'
+    _ctrl.should.have.properties 'gender', 'signin'
 
-      app = express()
+  it 'should store all routes to a stack', ->
 
-      _router = router(app)
+    router._stack.forEach (_stack) ->
+      _stack.should.have.properties 'path', 'method', '_ctrl', 'ctrl', 'action'
 
-      _router.callback = (req, res) -> res.json res.result
-
-      _router.get '/users/special', to: 'user#special'
-
-      app._router.stack.some (route) ->
-        return false unless _route = route?.route
-        _route.path is '/users/special' and _route.methods.get is true
-      .should.eql true
-
-      supertest(app).get('/users/special').end (err, res) ->
-        res.body.ok.should.eql 1
-        done err
-
-  describe 'Router#LoadCtrl', ->
-
-    it 'should mix the controller methods with mixers', ->
-
-      app = express()
-
-      _router = router(app)
-
-      _ctrl = _router._loadCtrl 'user'
-      _ctrl.should.have.properties 'gender', 'signin'

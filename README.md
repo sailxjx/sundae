@@ -32,6 +32,9 @@ Sundae is a light weight api framework based on express, but more intesting than
 # TODO
 
 # Changelog
+## v0.1.5
+* change router to singleton, add router _stack
+
 ## v0.1.4
 * fix post decorator bug
 

@@ -11,7 +11,6 @@ class Sundae
     @response = require './response'
     @router = require './router'
     @backbone = require './backbone'
-    @error = require './error'
     @BaseController = require './controller'
     @BaseHelper = require './helper'
     @BaseMailer = require './mailer'
@@ -31,7 +30,6 @@ class Sundae
     @config 'request'
     @config 'response'
     @config 'database'
-    @config 'error'
     @config 'router'
     return this
 

@@ -6,8 +6,9 @@ p = require 'path'
 
 class Router
 
-  constructor: (@app) ->
+  constructor: ->
     @_controllers = {}
+    @_stack = []
 
   middlewares: []
 
@@ -129,7 +130,15 @@ class Router
     if toString.call(path) is '[object String]' and @prefix
       path = '/' + p.join(@prefix, path)
 
-    @app[method] path, (req, res, next) ->
+    # Register apis
+    @_stack.push
+      path: path
+      method: method
+      _ctrl: _ctrl
+      ctrl: ctrl
+      action: action
+
+    @app?[method] path, (req, res, next) ->
       # Mix all params to one variable
       _params = _.extend(
         req.headers or {}
@@ -153,14 +162,16 @@ class Router
   http500: (err, req, res, next) ->
     res.status(500).json message: err?.message or 'Internal Server Error'
 
-router = (app) -> new Router(app)
+router = new Router
 
 router.config = (app, fn) ->
-  _router = router(app)
-  fn? _router
-  app.use _router.http404
-  app.use _router.http500
+  router.app = app
+  fn? router
+  app.use router.http404
+  app.use router.http500
 
 router.key = 'routes'
+
+router.Router = Router
 
 module.exports = router
