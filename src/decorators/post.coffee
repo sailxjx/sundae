@@ -5,13 +5,10 @@
 post = (req, res, fn, result = {}) ->
   return unless typeof fn is 'function'
   {_ctrl} = req
-  if fn.length is 3
-    fn.call _ctrl, req, res, result
-  else
-    fn.call _ctrl, req, result
+  fn.call _ctrl, req, res, result
 
 post.after = true
-post.key = post
+post.key = 'post'
 post.parallel = true
 
 module.exports = post
