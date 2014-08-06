@@ -20,7 +20,8 @@ describe 'Backbone', ->
       res.body.ok.should.eql 1
       done err
 
-  it 'should check for the global decorators and skip the useless ones', (done) ->
+  # Test for controller options
+  it 'should test for the only/except option', (done) ->
     app = express()
 
     class Custom extends sundae.BaseController
@@ -51,3 +52,36 @@ describe 'Backbone', ->
             should(res.body.ok).eql null
             next err
     ], done
+
+  it 'should test for the parallel option', (done) ->
+
+    app = express()
+
+    sleeped = false
+
+    class Custom extends sundae.BaseController
+
+      @after 'sleep20ms', parallel: true
+
+      read: (req, callback) -> callback null, ok: 1
+
+      sleep20ms: (req, res) ->
+        setTimeout ->
+          sleeped = true
+        , 20
+
+    app.use (req, res, next) ->
+      req._ctrl = new Custom
+      req.action = 'read'
+      backbone req, res, (req, res) -> res.json ok: 1
+
+    supertest app
+      .get '/read'
+      .end (err, res) ->
+        # AfterAction not executed
+        sleeped.should.eql false
+        # Wait 30ms
+        setTimeout ->
+          sleeped.should.eql true
+          done()
+        , 30

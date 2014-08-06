@@ -16,6 +16,7 @@ _normalizeOptions = (options) ->
   {only, except} = options
   options.only = util._toArray only
   options.except = util._toArray except
+  options.parallel or= false
   return options
 
 _insertCallbacks = (fn, props = []) ->
@@ -24,21 +25,27 @@ _insertCallbacks = (fn, props = []) ->
   @_afterActions = [] unless @_afterActions
   options = if toString.call(props[props.length - 1]) is '[object Object]' then props.pop() else {}
 
-  {only, except} = _normalizeOptions(options)
+  {only, except, parallel} = _normalizeOptions(options)
   _fn = fn(props)
 
-  _applyCallback = (req, res, result, next) ->
-    _result = result
+  # @param: {Object} req
+  # @param: {Object} res
+  # @param: {Object} result [optional]
+  # @param: {Function} callback
+  _applyCallback = (args...) ->
+    next = args.pop()
+    req = args[0]
     {action} = req
-
-    # Before callback will only have 3 arguments
-    if toString.call(result) is '[object Function]' and arguments.length is 3
-      next = result
-      _result = {}
+    result = if toString.call(args[2]) is '[object Function]' then {} else args[2]
 
     if (not _.isEmpty(only) and action not in only) or (not _.isEmpty(except) and action in except)
-      # Skip by options
-      next(null, _result)
+      # Skip by only/except options
+      next(null, result)
+    else if parallel
+      # Parallel execute function without callback
+      _fn.apply this, args
+      # Then skip
+      next(null, result)
     else
       _fn.apply this, arguments
 

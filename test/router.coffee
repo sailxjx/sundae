@@ -49,11 +49,6 @@ describe 'Router', ->
       res.body.ok.should.eql 1
       done err
 
-  it 'should mix the controller methods with mixers', ->
-
-    _ctrl = router._loadCtrl 'user'
-    _ctrl.should.have.properties 'gender', 'signin'
-
   it 'should store all routes to a stack', ->
 
     router._stack.forEach (_stack) ->

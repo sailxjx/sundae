@@ -1,5 +1,6 @@
 should = require 'should'
 express = require 'express'
+async = require 'async'
 BaseController = require '../lib/controller'
 
 describe 'Controller', ->
