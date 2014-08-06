@@ -3,7 +3,7 @@ async = require 'async'
 backbone = (req, res, callback) ->
 
   {_ctrl, action, middlewares} = req
-  decorators = _ctrl.decorators or []
+  {_beforeActions, _afterActions} = _ctrl.constructor
   middlewares or= []
 
   async.waterfall [
@@ -13,17 +13,10 @@ backbone = (req, res, callback) ->
         fn req, res, next
       , next
 
-    # Call before decorators
+    # Call before actions
     (next) ->
-      # console.log _ctrl
-      async.eachSeries decorators, (fn, next) ->
-        return next() unless fn.before
-        key = _ctrl[action][fn.key] or _ctrl[fn.key]
-        if fn.parallel
-          fn req, res, key
-          next()
-        else
-          fn req, res, key, next
+      async.eachSeries _beforeActions or [], (fn, next) ->
+        fn req, res, next
       , next
 
     # Call controller action
@@ -33,16 +26,10 @@ backbone = (req, res, callback) ->
       else
         _ctrl[action] req, next
 
-    # Call after decorators
+    # Call after actions
     (result, next) ->
-      async.reduce decorators, result, (result, fn, next) ->
-        return next(null, result) unless fn.after
-        key = _ctrl[action][fn.key] or _ctrl[fn.key]
-        if fn.parallel
-          fn req, res, key, result
-          next null, result
-        else
-          fn req, res, key, result, next
+      async.reduce _afterActions or [], result, (result, fn, next) ->
+        fn req, res, result, next
       , next
 
   ], (err, result) ->

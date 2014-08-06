@@ -31,6 +31,9 @@ Sundae is a light weight api framework based on express, but more intesting than
 
 # TODO
 
+* [ ] add alias for global declared decorator keys
+* [ ] mix methods to the class prototype, not the class instance
+
 # Changelog
 ## v0.1.5
 * change router to singleton, add router _stack
