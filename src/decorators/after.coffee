@@ -3,7 +3,7 @@
 async = require 'async'
 util = require '../util'
 
-assembler = (req, res, list, result = {}, callback = ->) ->
+assembler = (list) ->
   list = util._toArray list
 
   return (req, res, result, callback) ->

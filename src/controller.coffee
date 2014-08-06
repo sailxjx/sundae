@@ -53,7 +53,7 @@ select = require './decorators/select'
 class BaseController
 
   # Mixin methods from other modules
-  @mixin: (args...) ->
+  @mixin: (args...) -> args.forEach (parent) => _mixin this, parent
 
   # Ensure declared params
   @ensure: -> _insertCallbacks.call this, ensure, arguments

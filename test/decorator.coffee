@@ -55,7 +55,7 @@ describe 'Decorators#Before', ->
 
   after -> request.config app, (req) -> req.allowedKeys = []
 
-describe 'Decorators#Assembler', ->
+describe 'Decorators#After', ->
 
   it 'should call the after function and get a new property', (done) ->
     app = express()
@@ -66,9 +66,6 @@ describe 'Decorators#Assembler', ->
           callback()
       afterAction('isNew') req, res, {}, (err, result) ->
         result.should.have.properties 'isNew'
-      # also work when result is array
-      afterAction('isNew') req, res, [{}, {}], (err, results) ->
-        results.forEach (result) -> result.should.have.properties 'isNew'
       res.end 'ok'
     supertest(app).get('/').end done
 
