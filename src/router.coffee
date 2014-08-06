@@ -100,20 +100,6 @@ class Router
       sundae = require './sundae'
       _mainPath = sundae.get('mainPath')
       _ctrl = require p.join _mainPath, "controllers/#{ctrl}"
-
-      # Load mixers
-      mixers = _ctrl.mixers or ctrl
-      mixers = mixers.split new RegExp(' +') if toString.call(mixers) is '[object String]'
-      mixers.unshift ctrl if mixers.indexOf(ctrl) is -1
-      for mixer in mixers
-        try
-          mixer = require p.join _mainPath, "mixers/#{mixer}"
-          for key, fn of mixer
-            do (key, fn) ->
-              if not _ctrl[key]? and typeof fn is 'function'
-                _ctrl[key] = -> fn.apply _ctrl, arguments
-        catch e
-
       # Cache controller
       @_controllers[ctrl] = _ctrl
     return @_controllers[ctrl]
