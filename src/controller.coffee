@@ -2,14 +2,22 @@
 _ = require 'lodash'
 util = require './util'
 
+ensure = require './decorators/ensure'
+before = require './decorators/before'
+after = require './decorators/after'
+select = require './decorators/select'
+
 _mix = (base, target) ->
   ignores = ['__super__', 'constructor']
   base[key] = prop for key, prop of target when hasOwnProperty.call(target, key) and key not in ignores
   return base
 
 _mixin = (child, parent) ->
-  _mix(child, parent)
-  _mix(child.prototype, parent.prototype)
+  if toString.call(parent) is '[object Array]'
+    parent.forEach (obj) -> _mixin child, obj
+  else
+    _mix(child, parent)
+    _mix(child.prototype, parent.prototype)
   return child
 
 _normalizeOptions = (options) ->
@@ -52,15 +60,10 @@ _insertCallbacks = (fn, props = []) ->
   @_beforeActions.push _applyCallback if fn.before
   @_afterActions.push _applyCallback if fn.after
 
-ensure = require './decorators/ensure'
-before = require './decorators/before'
-after = require './decorators/after'
-select = require './decorators/select'
-
 class BaseController
 
   # Mixin methods from other modules
-  @mixin: (args...) -> args.forEach (parent) => _mixin this, parent
+  @mixin: (args...) -> _mixin this, args
 
   # Ensure declared params
   @ensure: -> _insertCallbacks.call this, ensure, arguments
