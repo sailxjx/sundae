@@ -29,7 +29,23 @@ Sundae is a light weight api framework based on express, but more intesting than
                     to mixin the modules with different name.
 ```
 
+# Cli Usage
+```
+  Usage: sundae [options] [command]
+
+  Commands:
+
+    init
+       prepare for the application folder
+
+
+  Options:
+
+    -h, --help  output usage information
+```
+
 # TODO
+* FIXME: parallel after callbacks
 
 # Changelog
 ## v0.1.5
