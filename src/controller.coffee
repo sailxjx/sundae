@@ -34,7 +34,7 @@ _insertCallbacks = (fn, props = []) ->
   options = if toString.call(props[props.length - 1]) is '[object Object]' then props.pop() else {}
 
   {only, except, parallel} = _normalizeOptions(options)
-  _fn = fn(props)
+  _fn = fn.apply(this, props)
 
   # @param: {Object} req
   # @param: {Object} res

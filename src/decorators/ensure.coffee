@@ -12,7 +12,7 @@ ensure = (ensures) ->
   return (req, res, callback = ->) ->
     missings = []
     ensures.forEach (_ensure) -> missings.push(_ensure) unless req.get(_ensure)?
-    return callback(new Err('MISSING_PARAMS', missings)) if missings.length > 0
+    return callback(new Err('MISSING_PARAMS', missings.join(', '))) if missings.length > 0
     callback(null)
 
 ensure.before = true
