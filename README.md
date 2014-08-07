@@ -48,25 +48,28 @@ Sundae is a light weight api framework based on express, but more intesting than
 * FIXME: parallel after callbacks
 
 # Changelog
-## v0.1.5
+## 0.2.0
+* change the statement of decorators
+
+## 0.1.5
 * change router to singleton, add router _stack
 
-## v0.1.4
+## 0.1.4
 * fix post decorator bug
 
-## v0.1.3
+## 0.1.3
 * add assembler, post decorators
 * fix mixer loader
 
-## v0.1.2
+## 0.1.2
 * auto load mixers
 
-## v0.1.1
+## 0.1.1
 * add more comments in demo controllers
 * fix request reset params bug
 * fix cli init crash
 
-## v0.1.0
+## 0.1.0
 * new beginning of sundae framework
 
 [npm-url]: https://npmjs.org/package/sundae
