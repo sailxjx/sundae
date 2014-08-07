@@ -15,18 +15,17 @@ Sundae is a light weight api framework based on express, but more intesting than
   - config          Application configs.
                     Include 'request', 'response', 'express', 'routes', etc.
   - controllers     Application controllers
-  - mailers         Codes deal with mails
-  - util            Utility static methods
-  - mixers          Codes you want to share between controllers.
+    - mixins        Codes you want to share between controllers.
                     it's something like 'lib' directory,
                     but the purpose is more clear than 'libraries'.
                     Someone (like me) may confused with how to share codes between controllers,
                     usually you can put these codes in `ApplicationController` or other base controllers.
                     But for most of time, `include` is better than `extend`,
                     so I'd like to put these codes in a different path, and `mix` them in.
-                    sundae will auto mix these modules to the controllers with same name
-                    you can define the `mixers` property in controller
-                    to mixin the modules with different name.
+                    you can mix them in by using the `@mixin` function in the declaration of controller
+  - helpers         Just helpers
+  - mailers         Codes deal with mails
+  - util            Utility static methods
 ```
 
 # Cli Usage
@@ -43,9 +42,76 @@ Sundae is a light weight api framework based on express, but more intesting than
 
     -h, --help  output usage information
 ```
+# A quick brief of router
+
+You can find this file in `app/config/routes`
+
+```coffeescript
+module.exports = (router) ->
+
+  # You can definitely declare the path to route
+  # Router support get/post/put/delete/options methods
+  # The route pattarn is something like `router.{method} path, to: {controller}#{action}`
+  router.get '/', to: 'home#index'
+
+  # # Post method
+  # router.post '/', to: 'home#create'
+
+  # # Put method
+  # router.put '/:_id', to: 'home#update'
+
+  # # Delete method
+  # router.delete '/:_id', to: 'home#delete'
+
+  # # Resource
+  # # Then you also got the `resource` function to do the above things more restfully
+  # router.resource 'home'
+```
+
+# A quick brief of controller
+
+You can try this controller in the `app/controllers` directory.
+
+```coffeescript
+class HomeController extends sundae.BaseController
+
+  # Mixin permission functions
+  @mixin require './mixins/permission'
+
+  # Request should contain these params
+  @ensure 'user-agent', only: 'index'
+
+  # These filters will execute before controller.index action
+  @before 'checkAgent'
+
+  # We'll filter the useless key of the callback data
+  @select '-useless'
+
+  # This assembler function is declared in home mixer
+  @after 'changeName'
+
+  # This is a controller action
+  # You can call this function through router
+  index: (req, callback) ->
+    callback null,
+      welcome: 'Hello World'
+      "user-agent": req.get('user-agent')
+      useless: 'useless message'
+
+  # This is a filter function looks like controller actions
+  # You can call this function from router
+  # But most time you shouldn't do this
+  checkAgent: (req, callback) ->
+    userAgent = req.get('user-agent')
+    # If the first param of callback is not null
+    # controller.index will not be called
+    return callback(new Error('GOD! WHY ARE YOU STILL USING IE?')) if userAgent.match /MSIE/
+    callback()
+
+module.exports = new HomeController
+```
 
 # TODO
-* FIXME: parallel after callbacks
 
 # Changelog
 ## 0.2.0
