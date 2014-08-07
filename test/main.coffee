@@ -1,5 +1,6 @@
 require './sundae'
 require './request'
+require './controller'
 require './response'
 require './decorator'
 require './backbone'

@@ -3,8 +3,6 @@ sundae = require '../../lib/sundae'
 
 class UserController extends sundae.BaseController
 
-  mixers: 'account'
-
   read: (req, callback) ->
     callback null, [{name: 'Grace'}, {name: 'Alice'}]
 

@@ -6,6 +6,21 @@ ApplicationController = require './application'
 # Demo home controller
 class HomeController extends ApplicationController
 
+  # Mixin home functions
+  @mixin require './mixins/home'
+
+  # Request should contain these params
+  @ensure 'user-agent', only: 'index'
+
+  # These filters will execute before controller.index action
+  @before 'checkAgent'
+
+  # We'll filter the useless key of the callback data
+  @select '-useless'
+
+  # This assembler function is declared in home mixer
+  @after 'changeName'
+
   # This is a controller action
   # You can call this function through router
   index: (req, callback) ->
@@ -13,18 +28,6 @@ class HomeController extends ApplicationController
       welcome: 'Hello World'
       "user-agent": req.get('user-agent')
       useless: 'useless message'
-
-  # Request should contain these params
-  @::index.ensure = 'user-agent'
-
-  # These filters will execute before controller.index action
-  @::index.filters = 'checkAgent'
-
-  # We'll filter the useless key of the callback data
-  @::index.select = '-useless'
-
-  # This assembler function is declared in home mixer
-  @::index.assemblers = 'changeName'
 
   # This is a filter function looks like controller actions
   # You can call this function from router
