@@ -114,6 +114,9 @@ module.exports = new HomeController
 # TODO
 
 # Changelog
+## 0.2.1
+* check invalid params in router
+
 ## 0.2.0
 * change the statement of decorators
 
