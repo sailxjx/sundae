@@ -35,7 +35,8 @@ describe 'Request', ->
       req.get('location').should.eql 'Shanghai'
 
       # Test validators
-      req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
+      err = req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
+      err.message.should.eql 'INVALID_PARAMS'
       req.get().should.not.have.properties 'fullname'
 
       # Test setters

@@ -135,7 +135,11 @@ class Router
         req.session or {}
       )
       req._params = {}
-      req.set(k, v) for k, v of _params
+      for k, v of _params
+        # response error message if the param is invalid
+        if (err = req.set(k, v)) instanceof Error
+          res.err = err
+          return callback(req, res)
       req._ctrl = _ctrl
       req.ctrl = ctrl
       req.action = action

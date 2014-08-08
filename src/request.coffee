@@ -1,5 +1,9 @@
 _ = require 'lodash'
 {request} = require 'express'
+try
+  Err = require 'err1st'
+catch e
+  Err = Error
 
 # Expand express request object
 request.config = (app, fn = ->) ->
@@ -42,7 +46,7 @@ request.config = (app, fn = ->) ->
 
     # Validators will filter the value and check for the returned value
     _validator = @validators[key] or @validators['_general']
-    return this if _validator? and not _validator(val, key)
+    return new Err('INVALID_PARAMS', key) if _validator? and not _validator(val, key)
 
     @_params[key] = val if key in @allowedKeys or force
     @[key] = val if key in @importKeys
