@@ -4,6 +4,11 @@ inflection = require 'inflection'
 backbone = require './backbone'
 p = require 'path'
 
+try
+  Err = require 'err1st'
+catch e
+  Err = Error
+
 class Router
 
   constructor: ->
@@ -147,10 +152,16 @@ class Router
       backbone req, res, callback
 
   http404: (req, res, next) ->
-    res.status(404).json message: 'Not Found'
+    err = new Err 'NOT_FOUND'
+    err.status = 404
+    res.err = err
+    res.response err
 
   http500: (err, req, res, next) ->
-    res.status(500).json message: err?.message or 'Internal Server Error'
+    err.status or= 500
+    err.message or= 'INTERNAL_SERVER_ERROR'
+    res.err = err
+    res.response err
 
 router = new Router
 

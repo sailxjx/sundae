@@ -116,6 +116,7 @@ module.exports = new HomeController
 # Changelog
 ## 0.2.1
 * check invalid params in router
+* error support for 404 and 500 response
 
 ## 0.2.0
 * change the statement of decorators
