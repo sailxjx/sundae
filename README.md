@@ -9,7 +9,7 @@ Rtf restful framework for node
 
 Sundae is a light weight api framework based on express, but more intesting than express.
 
-# Application Structure
+# Application structure
 ```
 - app
   - config          Application configs.
@@ -28,7 +28,7 @@ Sundae is a light weight api framework based on express, but more intesting than
   - util            Utility static methods
 ```
 
-# Cli Usage
+# Cli usage
 ```
   Usage: sundae [options] [command]
 
@@ -111,38 +111,60 @@ class HomeController extends sundae.BaseController
 module.exports = new HomeController
 ```
 
+# Router options
+
+- `only` only keep the specific actions
+- `except` without the specific actions
+
+# Decorator options
+
+- `only` only the specific actions will apply hooks
+- `except` all actions will apply hooks without the except actions
+- `parallel` hooks will be parallel executed, the default mode is series (execute one by one)
+- `transfer` transfer the result into expected format before apply hooks
+
 # TODO
 
-1. argument options in decorator: `@after 'notify', get: (message) -> message`
-
 # Changelog
+
+## 0.2.2
+
+- add `transfer` option
+
 ## 0.2.1
-* check invalid params in router
-* error support for 404 and 500 response
+
+- check invalid params in router
+- error support for 404 and 500 response
 
 ## 0.2.0
-* change the statement of decorators
+
+- change the statement of decorators
 
 ## 0.1.5
-* change router to singleton, add router _stack
+
+- change router to singleton, add router _stack
 
 ## 0.1.4
-* fix post decorator bug
+
+- fix post decorator bug
 
 ## 0.1.3
-* add assembler, post decorators
-* fix mixer loader
+
+- add assembler, post decorators
+- fix mixer loader
 
 ## 0.1.2
-* auto load mixers
+
+- auto load mixers
 
 ## 0.1.1
-* add more comments in demo controllers
-* fix request reset params bug
-* fix cli init crash
+
+- add more comments in demo controllers
+- fix request reset params bug
+- fix cli init crash
 
 ## 0.1.0
-* new beginning of sundae framework
+- new beginning of sundae framework
 
 [npm-url]: https://npmjs.org/package/sundae
 [npm-image]: http://img.shields.io/npm/v/sundae.svg
