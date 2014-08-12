@@ -25,7 +25,6 @@ _normalizeOptions = (options) ->
   options.only = util._toArray only
   options.except = util._toArray except
   options.parallel or= false
-  delete options.transfer unless toString.call(options.transfer) is '[object Function]'
   return options
 
 _insertCallbacks = (fn, props = []) ->
@@ -34,7 +33,7 @@ _insertCallbacks = (fn, props = []) ->
   @_afterActions = [] unless @_afterActions
   options = if toString.call(props[props.length - 1]) is '[object Object]' then props.pop() else {}
 
-  {only, except, parallel, transfer} = _normalizeOptions(options)
+  {only, except, parallel} = _normalizeOptions(options)
   _fn = fn.apply(this, props)
 
   # @param: {Object} req
@@ -50,12 +49,10 @@ _insertCallbacks = (fn, props = []) ->
       # Skip by only/except options
       next(null, args[2] or {})
     else
-      if args[2] and transfer?
-        args[2] = transfer? args[2]
       if parallel
         # Parallel execute function without callback
         _fn.apply this, args
-        # Then skip
+        # Then skip and use the origin result
         next(null, args[2] or {})
       else
         _fn.apply this, arguments

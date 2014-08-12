@@ -95,27 +95,3 @@ describe 'Controller', ->
           sleeped.should.eql true
           done()
         , 30
-
-  it 'should test for the transfer option', (done) ->
-
-    app = express()
-
-    class Custom extends BaseController
-
-      @after 'showMessage', transfer: (message) -> message.content = 'hi'
-
-      read: (req, callback) -> callback null, content: 'hello'
-
-      showMessage: (req, res, message, next) -> next null, message
-
-    app.use (req, res, next) ->
-      req._ctrl = new Custom
-      req.action = 'read'
-      backbone req, res, (req, res) ->
-        res.result.content.should.eql 'hi'
-        res.json ok: 1
-
-    supertest app
-      .get '/read'
-      .end done
-
