@@ -113,6 +113,8 @@ module.exports = new HomeController
 
 # TODO
 
+1. argument options in decorator: `@after 'notify', get: (message) -> message`
+
 # Changelog
 ## 0.2.1
 * check invalid params in router
