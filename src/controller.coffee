@@ -50,7 +50,8 @@ _insertCallbacks = (fn, props = []) ->
       # Skip by only/except options
       next(null, args[2] or {})
     else
-      args[2] = transfer? args[2] if args[2]
+      if args[2] and transfer?
+        args[2] = transfer? args[2]
       if parallel
         # Parallel execute function without callback
         _fn.apply this, args

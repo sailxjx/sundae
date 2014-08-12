@@ -83,7 +83,7 @@ describe 'Controller', ->
     app.use (req, res, next) ->
       req._ctrl = new Custom
       req.action = 'read'
-      backbone req, res, (req, res) -> res.json ok: 1
+      backbone req, res, (req, res) -> res.json res.result
 
     supertest app
       .get '/read'

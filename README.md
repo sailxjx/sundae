@@ -127,9 +127,9 @@ module.exports = new HomeController
 
 # Changelog
 
-## 0.2.2
+## 0.2.2 ~ 0.2.3
 
-- add `transfer` option
+- add `transfer` option and fix option bugs
 
 ## 0.2.1
 
