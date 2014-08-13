@@ -127,6 +127,10 @@ module.exports = new HomeController
 
 # Changelog
 
+## 0.2.5
+
+- clone _before/_after actions when extends from parent class
+
 ## 0.2.2 ~ 0.2.4
 
 - give up using `transfer` option, it's not a good idea, find another way

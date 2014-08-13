@@ -8,6 +8,27 @@ backbone = require '../lib/backbone'
 
 describe 'Controller', ->
 
+  it 'should clone properties to the child class when extending', ->
+
+    class App extends BaseController
+
+      @ensure 'app'
+
+    class A extends App
+
+      @ensure 'a'
+
+    class B extends App
+
+      @ensure 'b1'
+      @ensure 'b2'
+
+    a = new A
+    b = new B
+    # They are separated
+    a.constructor._beforeActions.length.should.eql 2
+    b.constructor._beforeActions.length.should.eql 3
+
   it 'should mix methods from other instance by mixin function', ->
 
     class Mixin1

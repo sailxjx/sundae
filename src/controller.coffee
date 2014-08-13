@@ -9,7 +9,9 @@ select = require './decorators/select'
 
 _mix = (base, target) ->
   ignores = ['__super__', 'constructor']
-  base[key] = prop for key, prop of target when hasOwnProperty.call(target, key) and key not in ignores
+  for key, prop of target
+    if hasOwnProperty.call(target, key) and key not in ignores
+      base[key] = prop
   return base
 
 _mixin = (child, parent) ->
@@ -29,8 +31,8 @@ _normalizeOptions = (options) ->
 
 _insertCallbacks = (fn, props = []) ->
   props = Array.prototype.slice.call(props, 0) if toString.call(props) is '[object Arguments]'
-  @_beforeActions = [] unless @_beforeActions
-  @_afterActions = [] unless @_afterActions
+  @_beforeActions = if @_beforeActions then _.clone(@_beforeActions) else []
+  @_afterActions = if @_afterActions then _.clone(@_afterActions) else []
   options = if toString.call(props[props.length - 1]) is '[object Object]' then props.pop() else {}
 
   {only, except, parallel} = _normalizeOptions(options)
