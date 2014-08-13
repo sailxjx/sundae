@@ -3,7 +3,7 @@
 async = require 'async'
 util = require '../util'
 
-assembler = (list) ->
+after = (list) ->
   list = util._toArray list
 
   return (req, res, result, callback) ->
@@ -25,6 +25,6 @@ assembler = (list) ->
           fn.call _ctrl, req, result, (err, _result) -> next err, _result or result
       , callback
 
-assembler.after = true
+after.after = true
 
-module.exports = assembler
+module.exports = after
