@@ -44,11 +44,13 @@ request.config = (app, fn = ->) ->
     if typeof @setters[key] is 'function'
       return @setters[key].call(this, val)
 
+    return this unless key in @allowedKeys or force
+
     # Validators will filter the value and check for the returned value
     _validator = @validators[key] or @validators['_general']
     return new Err('INVALID_PARAMS', key) if _validator? and not _validator(val, key)
 
-    @_params[key] = val if key in @allowedKeys or force
+    @_params[key] = val
     @[key] = val if key in @importKeys
     return this
 
