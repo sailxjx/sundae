@@ -125,6 +125,12 @@ module.exports = new HomeController
 
 # TODO
 
+- `skip` option for skipping hooks
+
+# NEXT GENERATION
+
+- direct modify controller class
+
 # Changelog
 
 ## 0.2.5
