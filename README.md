@@ -130,6 +130,10 @@ module.exports = new HomeController
 
 # Changelog
 
+## 0.2.7
+
+- ignore lib directory in development mode
+
 ## 0.2.5
 
 - clone _before/_after actions when extends from parent class
