@@ -126,10 +126,7 @@ module.exports = new HomeController
 # TODO
 
 - `skip` option for skipping hooks
-
-# NEXT GENERATION
-
-- direct modify controller class
+- (next) direct modify controller class, create a generator function
 
 # Changelog
 
