@@ -3,8 +3,8 @@ express = require 'express'
 async = require 'async'
 supertest = require 'supertest'
 
-BaseController = require '../lib/controller'
-backbone = require '../lib/backbone'
+BaseController = require '../src/controller'
+backbone = require '../src/backbone'
 
 describe 'Controller', ->
 

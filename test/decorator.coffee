@@ -2,12 +2,12 @@ should = require 'should'
 express = require 'express'
 supertest = require 'supertest'
 
-ensure = require '../lib/decorators/ensure'
-beforeAction = require '../lib/decorators/before'
-select = require '../lib/decorators/select'
-afterAction = require '../lib/decorators/after'
-request = require '../lib/request'
-response = require '../lib/response'
+ensure = require '../src/decorators/ensure'
+beforeAction = require '../src/decorators/before'
+select = require '../src/decorators/select'
+afterAction = require '../src/decorators/after'
+request = require '../src/request'
+response = require '../src/response'
 
 describe 'Decorators#Ensure', ->
 

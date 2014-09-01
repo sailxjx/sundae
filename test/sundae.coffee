@@ -1,6 +1,6 @@
 should = require 'should'
 supertest = require 'supertest'
-sundae = require '../lib/sundae'
+sundae = require '../src/sundae'
 
 describe 'Sundae', ->
 

@@ -1,5 +1,5 @@
 # Demo user controller for testing
-sundae = require '../../lib/sundae'
+sundae = require '../../src/sundae'
 
 class UserController extends sundae.BaseController
 

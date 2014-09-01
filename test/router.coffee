@@ -1,10 +1,10 @@
 should = require 'should'
 express = require 'express'
 supertest = require 'supertest'
-router = require '../lib/router'
-request = require '../lib/request'
-response = require '../lib/response'
-sundae = require '../lib/sundae'
+router = require '../src/router'
+request = require '../src/request'
+response = require '../src/response'
+sundae = require '../src/sundae'
 
 describe 'Router', ->
 

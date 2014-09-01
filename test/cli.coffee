@@ -2,7 +2,7 @@ should = require 'should'
 fs = require 'fs'
 path = require 'path'
 sh = require 'shelljs'
-cli = require '../lib/cli'
+cli = require '../src/cli'
 
 clean = ->
   sh.rm '-rf', path.join(__dirname, 'app')

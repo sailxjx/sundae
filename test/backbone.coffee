@@ -3,8 +3,8 @@ express = require 'express'
 supertest = require 'supertest'
 async = require 'async'
 
-backbone = require '../lib/backbone'
-sundae = require '../lib/sundae'
+backbone = require '../src/backbone'
+sundae = require '../src/sundae'
 
 describe 'Backbone', ->
 

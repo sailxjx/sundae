@@ -3,7 +3,7 @@ async = require 'async'
 express = require 'express'
 supertest = require 'supertest'
 
-response = require '../lib/response'
+response = require '../src/response'
 
 describe 'Response', ->
 
