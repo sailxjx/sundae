@@ -3,7 +3,7 @@ sundae
 
 Rtf restful framework for node
 
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Gitter chat][gitter-image]][gitter-url]
 
 # Intro
 
@@ -182,3 +182,6 @@ module.exports = new HomeController
 
 [travis-url]: https://travis-ci.org/sailxjx/sundae
 [travis-image]: http://img.shields.io/travis/sailxjx/sundae.svg
+
+[gitter-url]: https://gitter.im/sailxjx/sundae
+[gitter-image]: https://badges.gitter.im/sailxjx/sundae.png
