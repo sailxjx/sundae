@@ -15,6 +15,4 @@ ensure = (ensures) ->
     return callback(new Err('MISSING_PARAMS', missings.join(', '))) if missings.length > 0
     callback(null)
 
-ensure.before = true
-
 module.exports = ensure

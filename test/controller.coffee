@@ -26,8 +26,8 @@ describe 'Controller', ->
     a = new A
     b = new B
     # They are separated
-    a.constructor._beforeActions.length.should.eql 2
-    b.constructor._beforeActions.length.should.eql 3
+    a.constructor._hooks.length.should.eql 2
+    b.constructor._hooks.length.should.eql 3
 
   it 'should mix methods from other instance by mixin function', ->
 

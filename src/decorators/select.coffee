@@ -35,6 +35,4 @@ select = (fields) ->
     else
       callback null, result
 
-select.after = true
-
 module.exports = select
