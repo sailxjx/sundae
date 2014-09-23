@@ -26,7 +26,7 @@ describe 'Request', ->
 
       # Test allowdKeys
       req.set 'name', 'Grace'
-      req.set 'nickname', 'GG'
+      req.set 'nickname', 'GG', true
       req.get().should.have.properties 'name'
       req.get().should.not.have.properties 'nickname'
 
@@ -42,14 +42,16 @@ describe 'Request', ->
       # Test setters
       req.set 'email', 'grace@gmail.com'
       req.email.should.eql 'grace@gmail.com'
-      res.end 'ok'
 
       # Test remove
       req.remove '_id'
       should(req._id).eql null
       should(req.get('_id')).eql null
 
-    supertest(app).get('/').end(done)
+      res.end 'ok'
+      done()
+
+    supertest(app).get('/').end(->)
 
   after ->
     request.config app, (req) ->

@@ -10,7 +10,7 @@ request.config = (app, fn = ->) ->
   # Keys will import as request properties
   request.importKeys = []
 
-  # Keys allowed in `set` function
+  # Keys allowed in `set` function when using allowed option
   request.allowedKeys = []
 
   # Alias keys will be converted to the value key
@@ -34,9 +34,9 @@ request.config = (app, fn = ->) ->
   # Set params in request object
   # @param {String} `key` key-value's key
   # @param {String} `val` key-value's value
-  # @param {Boolean} `force` ignore allowed keys
+  # @param {Boolean} `onlyAllowed` only use allowed keys
   # @return {Object} request object
-  request.set = (key, val, force = false) ->
+  request.set = (key, val, onlyAllowed = false) ->
     @_params = {} unless @_params?
     aliasKey = @alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
@@ -44,7 +44,7 @@ request.config = (app, fn = ->) ->
     if typeof @setters[key] is 'function'
       return @setters[key].call(this, val)
 
-    return this unless key in @allowedKeys or force
+    return this if onlyAllowed and key not in @allowedKeys
 
     # Validators will filter the value and check for the returned value
     _validator = @validators[key] or @validators['_general']

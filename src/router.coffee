@@ -142,7 +142,7 @@ class Router
       req._params = {}
       for k, v of _params
         # response error message if the param is invalid
-        if (err = req.set(k, v)) instanceof Error
+        if (err = req.set(k, v, true)) instanceof Error
           res.err = err
           return callback(req, res)
       req._ctrl = _ctrl
