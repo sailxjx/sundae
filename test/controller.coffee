@@ -5,6 +5,7 @@ supertest = require 'supertest'
 
 BaseController = require '../src/controller'
 backbone = require '../src/backbone'
+incubator = require '../src/incubator'
 
 describe 'Controller', ->
 
@@ -26,8 +27,8 @@ describe 'Controller', ->
     a = new A
     b = new B
     # They are separated
-    a.constructor._beforeActions.length.should.eql 2
-    b.constructor._beforeActions.length.should.eql 3
+    a.constructor._hooks.length.should.eql 2
+    b.constructor._hooks.length.should.eql 3
 
   it 'should mix methods from other instance by mixin function', ->
 
@@ -64,8 +65,11 @@ describe 'Controller', ->
       readOne: (req, callback) -> callback null, ok: 1
 
     app.use (req, res, next) ->
-      req._ctrl = new Custom
+      req.ctrlObj = new Custom
       req.action = req.path[1..]
+
+      incubator req.ctrlObj, req.action
+
       backbone req, res, (req, res) ->
         res.json res.err or res.result
 
@@ -102,8 +106,11 @@ describe 'Controller', ->
         , 20
 
     app.use (req, res, next) ->
-      req._ctrl = new Custom
+      req.ctrlObj = new Custom
       req.action = 'read'
+
+      incubator req.ctrlObj, req.action
+
       backbone req, res, (req, res) -> res.json res.result
 
     supertest app

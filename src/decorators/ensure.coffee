@@ -1,9 +1,6 @@
 # Ensure declared params
 # Or response error messages when miss some param
-try
-  Err = require 'err1st'
-catch e
-  Err = Error
+Err = require 'err1st'
 util = require '../util'
 
 ensure = (ensures) ->
@@ -14,7 +11,5 @@ ensure = (ensures) ->
     ensures.forEach (_ensure) -> missings.push(_ensure) unless req.get(_ensure)?
     return callback(new Err('MISSING_PARAMS', missings.join(', '))) if missings.length > 0
     callback(null)
-
-ensure.before = true
 
 module.exports = ensure

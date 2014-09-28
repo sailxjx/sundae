@@ -18,7 +18,7 @@ describe 'Decorators#Ensure', ->
   it 'should callback error when params not meet ensures', (done) ->
     app.use (req, res) ->
       req.set 'name', 'hi'
-      ensure('name _sessionUserId') req, res, (err) -> should(err).not.eql null
+      ensure('_sessionUserId') req, res, (err) -> should(err).not.eql null
       res.end 'ok'
 
     supertest(app).get('/').end done
@@ -27,7 +27,7 @@ describe 'Decorators#Ensure', ->
     app.use (req, res) ->
       req.set 'name', 'hi'
       req.set 'lang', 'en'
-      ensure('name lang') req, res, (err) -> should(err).eql null
+      ensure('name') req, res, (err) -> should(err).eql null
       res.end 'ok'
 
     supertest(app).get('/').end done
@@ -43,7 +43,7 @@ describe 'Decorators#Before', ->
   it 'should callback error when use ensureMember before hook', (done) ->
     app.use (req, res) ->
       req.set 'name', 'Grace'
-      req._ctrl =
+      req.ctrlObj =
         upper: (req, res, next) ->
           req.set('name', req.get('name').toUpperCase())
           next()
@@ -60,10 +60,10 @@ describe 'Decorators#After', ->
   it 'should call the after function and get a new property', (done) ->
     app = express()
     app.use (req, res) ->
-      req._ctrl =
-        isNew: (req, result, callback) ->
+      req.ctrlObj =
+        isNew: (req, res, result, callback) ->
           result.isNew = true
-          callback()
+          callback(null, result)
       afterAction('isNew') req, res, {}, (err, result) ->
         result.should.have.properties 'isNew'
       res.end 'ok'

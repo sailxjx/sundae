@@ -39,6 +39,7 @@
     "express": "^4.5.1",
     "inflection": "^1.3.8",
     "shelljs": "^0.3.0",
-    "commander": "^2.3.0"
+    "commander": "^2.3.0",
+    "err1st": "^0.1.2"
   }
 }
