@@ -52,5 +52,5 @@ describe 'Router', ->
   it 'should store all routes to a stack', ->
 
     router._stack.forEach (_stack) ->
-      _stack.should.have.properties 'path', 'method', '_ctrl', 'ctrl', 'action'
+      _stack.should.have.properties 'path', 'method', 'ctrlObj', 'ctrl', 'action'
 

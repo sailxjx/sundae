@@ -3,12 +3,12 @@
 before = (method) ->
 
   return (req, res, callback = ->) ->
-    {_ctrl} = req
-    fn = _ctrl[method]
+    {ctrlObj} = req
+    fn = ctrlObj[method]
     return callback() unless typeof fn is 'function'
     if fn.length is 3
-      fn.call _ctrl, req, res, callback
+      fn.call ctrlObj, req, res, callback
     else
-      fn.call _ctrl, req, callback
+      fn.call ctrlObj, req, callback
 
 module.exports = before

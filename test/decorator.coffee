@@ -43,7 +43,7 @@ describe 'Decorators#Before', ->
   it 'should callback error when use ensureMember before hook', (done) ->
     app.use (req, res) ->
       req.set 'name', 'Grace'
-      req._ctrl =
+      req.ctrlObj =
         upper: (req, res, next) ->
           req.set('name', req.get('name').toUpperCase())
           next()
@@ -60,7 +60,7 @@ describe 'Decorators#After', ->
   it 'should call the after function and get a new property', (done) ->
     app = express()
     app.use (req, res) ->
-      req._ctrl =
+      req.ctrlObj =
         isNew: (req, res, result, callback) ->
           result.isNew = true
           callback(null, result)

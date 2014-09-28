@@ -2,7 +2,7 @@ async = require 'async'
 
 backbone = (req, res, callback) ->
 
-  {_ctrl, action, middlewares} = req
+  {ctrlObj, action, middlewares} = req
   middlewares or= []
 
   async.waterfall [
@@ -14,7 +14,7 @@ backbone = (req, res, callback) ->
 
     # Call actions
     (next) ->
-      _ctrl[action] req, res, next
+      ctrlObj[action] req, res, next
 
   ], (err, result) ->
     res.err = err

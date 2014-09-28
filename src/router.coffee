@@ -1,9 +1,10 @@
 _ = require 'lodash'
 async = require 'async'
 inflection = require 'inflection'
-backbone = require './backbone'
 p = require 'path'
 Err = require 'err1st'
+backbone = require './backbone'
+incubator = require './incubator'
 
 class Router
 
@@ -100,9 +101,9 @@ class Router
       # Let it crash if controller not found
       sundae = require './sundae'
       _mainPath = sundae.get('mainPath')
-      _ctrl = require p.join _mainPath, "controllers/#{ctrl}"
+      ctrlObj = require p.join _mainPath, "controllers/#{ctrl}"
       # Cache controller
-      @_controllers[ctrl] = _ctrl
+      @_controllers[ctrl] = ctrlObj
     return @_controllers[ctrl]
 
   _apply: (options = {}) ->
@@ -111,8 +112,11 @@ class Router
     callback or= @callback
     action or= 'index'
 
-    _ctrl = @_loadCtrl ctrl
-    return false unless typeof _ctrl[action] is 'function'
+    ctrlObj = @_loadCtrl ctrl
+    return false unless typeof ctrlObj[action] is 'function'
+
+    # Bind hooks
+    incubator ctrlObj, action
 
     if toString.call(path) is '[object String]' and @prefix
       path = '/' + p.join(@prefix, path)
@@ -121,7 +125,7 @@ class Router
     @_stack.push
       path: path
       method: method
-      _ctrl: _ctrl
+      ctrlObj: ctrlObj
       ctrl: ctrl
       action: action
 
@@ -141,7 +145,7 @@ class Router
         if (err = req.set(k, v, true)) instanceof Error
           res.err = err
           return callback(req, res)
-      req._ctrl = _ctrl
+      req.ctrlObj = ctrlObj
       req.ctrl = ctrl
       req.action = action
       req.middlewares = middlewares

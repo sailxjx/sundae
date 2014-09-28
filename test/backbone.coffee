@@ -12,7 +12,7 @@ describe 'Backbone', ->
     app = express()
 
     app.use (req, res, next) ->
-      req._ctrl = read: (req, res, callback) -> callback null, ok: 1
+      req.ctrlObj = read: (req, res, callback) -> callback null, ok: 1
       req.action = 'read'
       backbone req, res, (req, res) -> res.json res.result
 

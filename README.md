@@ -130,6 +130,10 @@ module.exports = new HomeController
 
 # Changelog
 
+## 0.3.0
+- hooks do not apply on each action now, they are only bind to actions emit by router
+- embed err1st package
+
 ## 0.2.7
 
 - ignore lib directory in development mode
