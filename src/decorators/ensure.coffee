@@ -1,9 +1,6 @@
 # Ensure declared params
 # Or response error messages when miss some param
-try
-  Err = require 'err1st'
-catch e
-  Err = Error
+Err = require 'err1st'
 util = require '../util'
 
 ensure = (ensures) ->

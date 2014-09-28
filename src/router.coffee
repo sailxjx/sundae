@@ -3,11 +3,7 @@ async = require 'async'
 inflection = require 'inflection'
 backbone = require './backbone'
 p = require 'path'
-
-try
-  Err = require 'err1st'
-catch e
-  Err = Error
+Err = require 'err1st'
 
 class Router
 

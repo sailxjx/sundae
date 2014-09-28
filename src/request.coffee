@@ -1,9 +1,6 @@
 _ = require 'lodash'
 {request} = require 'express'
-try
-  Err = require 'err1st'
-catch e
-  Err = Error
+Err = require 'err1st'
 
 # Expand express request object
 request.config = (app, fn = ->) ->
