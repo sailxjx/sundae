@@ -60,9 +60,9 @@ describe 'Controller', ->
 
       @ensure '_userId', only: 'readOne'
 
-      read: (req, callback) -> callback null, ok: 1
+      read: (req, res, callback) -> callback null, ok: 1
 
-      readOne: (req, callback) -> callback null, ok: 1
+      readOne: (req, res, callback) -> callback null, ok: 1
 
     app.use (req, res, next) ->
       req.ctrlObj = new Custom
@@ -98,7 +98,7 @@ describe 'Controller', ->
 
       @after 'sleep20ms', parallel: true
 
-      read: (req, callback) -> callback null, ok: 1
+      read: (req, res, callback) -> callback null, ok: 1
 
       sleep20ms: (req, res) ->
         setTimeout ->

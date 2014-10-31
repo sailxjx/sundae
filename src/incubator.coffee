@@ -27,13 +27,7 @@ _incubate = (ctrlObj, actionName) ->
         else
           hook.call ctrlObj, req, res, result, callback
 
-  # Prevent missing argument of action
-  _wrapAction = (actionFn) ->
-    return actionFn if actionFn.length is 3
-    _actionFn = actionFn
-    return (req, res, callback) -> _actionFn.call ctrlObj, req, callback
-
-  actionFn = _wrapAction ctrlObj[actionName]
+  actionFn = ctrlObj[actionName]
 
   _hooks.forEach (hook) ->
     {only, except, parallel} = hook

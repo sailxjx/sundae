@@ -3,19 +3,19 @@ sundae = require '../../src/sundae'
 
 class UserController extends sundae.BaseController
 
-  read: (req, callback) ->
+  read: (req, res, callback) ->
     callback null, [{name: 'Grace'}, {name: 'Alice'}]
 
-  readOne: (req, callback) ->
+  readOne: (req, res, callback) ->
     callback null, name: 'Grace'
 
-  create: (req, callback) ->
+  create: (req, res, callback) ->
     # Do something create
     callback null, name: 'Grace'
 
   # This is a special function
   # You should specific define the route in router file
-  special: (req, callback) ->
+  special: (req, res, callback) ->
     callback null, ok: 1
 
 module.exports = new UserController

@@ -130,6 +130,9 @@ module.exports = new HomeController
 
 # Changelog
 
+## 0.3.1
+- remove wrap of actions, every action will receive three arguments: req, res, callback
+
 ## 0.3.0
 - hooks do not apply on each action now, they are only bind to actions emit by router
 - embed err1st package
