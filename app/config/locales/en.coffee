@@ -1,2 +1,2 @@
 module.exports =
-  MISSING_PARAMS: (args...) -> "missing params: #{args.join(',')}"
+  PARAMS_MISSING: (args...) -> "missing params: #{args.join(',')}"

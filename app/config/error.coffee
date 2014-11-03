@@ -2,4 +2,4 @@ module.exports = (handler) ->
   handler.locales = ['zh', 'en']
   handler.localeDir = "#{__dirname}/locales"
   handler.map =
-    MISSING_PARAMS: 400100
+    PARAMS_MISSING: 400100
