@@ -125,8 +125,8 @@ module.exports = new HomeController
 
 # TODO
 
+- `transfer` option to call before middlewares
 - `skip` option for skipping hooks
-- (next) direct modify controller class, create a generator function
 
 # Changelog
 
