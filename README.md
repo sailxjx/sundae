@@ -130,6 +130,9 @@ module.exports = new HomeController
 
 # Changelog
 
+## 0.3.3
+- fix expand of req.headers, req.cookies etc.
+
 ## 0.3.1
 - remove wrap of actions, every action will receive three arguments: req, res, callback
 

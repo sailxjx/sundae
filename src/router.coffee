@@ -132,12 +132,12 @@ class Router
     @app?[method] path, (req, res, next) ->
       # Mix all params to one variable
       _params = _.extend(
-        req.headers or {}
-        req.cookies or {}
-        req.params or {}
-        req.query or {}
-        req.body or {}
-        req.session or {}
+        _.clone(req.headers or {})
+        _.clone(req.cookies or {})
+        _.clone(req.params or {})
+        _.clone(req.query or {})
+        _.clone(req.body or {})
+        _.clone(req.session or {})
       )
       req._params = {}
       for k, v of _params
