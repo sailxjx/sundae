@@ -45,8 +45,8 @@ describe 'Request', ->
 
       # Test remove
       req.remove '_id'
-      should(req._id).eql null
-      should(req.get('_id')).eql null
+      should(req._id).eql undefined
+      should(req.get('_id')).eql undefined
 
       res.end 'ok'
       done()

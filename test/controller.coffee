@@ -84,7 +84,7 @@ describe 'Controller', ->
         supertest app
           .get '/readOne'
           .end (err, res) ->
-            should(res.body.ok).eql null
+            should(res.body.ok).eql undefined
             next err
     ], done
 
