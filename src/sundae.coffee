@@ -69,5 +69,6 @@ class Sundae
   run: (callback = ->) -> @init().listen callback
 
 sundae = new Sundae
+sundae.express = express
 
 module.exports = sundae
