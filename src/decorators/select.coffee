@@ -24,6 +24,7 @@ select = (fields) ->
 
     _select = (result) ->
       result = toJSON result
+      return result unless toString.call(result) is '[object Object]'
       result = _.pick result, picks if picks.length
       result = _.omit result, omits if omits.length
       return result

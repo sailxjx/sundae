@@ -86,3 +86,8 @@ describe 'Decorators#Select', ->
       updatedAt: '2014-02-24T03:50:00.841Z'
     select('-password') {}, {}, result, (err, result) ->
       result.should.have.keys 'name', 'updatedAt'
+
+  it 'should get the correct fields when the result is an array', ->
+    result = ['a', 'b', 'c']
+    select('-any') {}, {}, result, (err, result) ->
+      result.should.eql ['a', 'b', 'c']
