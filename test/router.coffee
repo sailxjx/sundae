@@ -49,6 +49,12 @@ describe 'Router', ->
       res.body.ok.should.eql 1
       done err
 
+  it 'should use the applied controller in the newuser route', (done) ->
+    router.resource 'newuser', ctrl: 'guest'
+    supertest(app).get('/newusers/1').end (err, res) ->
+      res.body.name.should.eql 'Bran'
+      done err
+
   it 'should store all routes to a stack', ->
 
     router._stack.forEach (_stack) ->

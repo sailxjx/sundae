@@ -130,6 +130,9 @@ module.exports = new HomeController
 
 # Changelog
 
+## 0.3.6
+- use some options in the resource directive, e.g. `ctrl`, `action` ...
+
 ## 0.3.3
 - fix expand of req.headers, req.cookies etc.
 

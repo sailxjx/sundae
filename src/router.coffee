@@ -63,11 +63,12 @@ class Router
       map = _.omit(map, except)
 
     for action, opt of map
-      _options = _.extend options,
+      _options = _.extend
         ctrl: ctrl
         action: action
         method: opt.method
         path: opt.path
+      , options
       @_apply _options
 
   get: ->
