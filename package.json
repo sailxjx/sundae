@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "make test",
-    "prepublish": "coffee -o lib -c src"
+    "prepublish": "rm -rf lib && coffee -o lib -c src"
   },
   "bin": {
     "sundae": "./bin/sundae"
@@ -28,18 +28,16 @@
     "url": "https://github.com/sailxjx/sundae/issues"
   },
   "devDependencies": {
-    "should": "^4.0.4",
     "coffee-script": "^1.7.1",
+    "express": "^4.10.6",
     "mocha": "^1.20.1",
+    "should": "^4.0.4",
     "supertest": "^0.13.0"
   },
   "dependencies": {
     "async": "^0.9.0",
-    "lodash": "^2.4.1",
-    "express": ">=4.5.1",
+    "err1st": "^0.1.2",
     "inflection": "^1.3.8",
-    "shelljs": "^0.3.0",
-    "commander": "^2.3.0",
-    "err1st": "^0.1.2"
+    "lodash": "^2.4.1"
   }
 }

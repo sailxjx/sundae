@@ -12,8 +12,6 @@ class Sundae
     @router = require './router'
     @backbone = require './backbone'
     @BaseController = require './controller'
-    @BaseHelper = require './helper'
-    @BaseMailer = require './mailer'
     # Set main directory of application
     @set 'mainPath', path.join(process.cwd(), 'app')
 
