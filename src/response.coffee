@@ -1,7 +1,8 @@
-{response} = require 'express'
-
 # Expand express response object
-response.config = (app, fn = ->) ->
+module.exports = (app, fn = ->) ->
+
+  {response} = app
+
   response.response = ->
     {err, result} = this
     if err?
@@ -10,4 +11,4 @@ response.config = (app, fn = ->) ->
       @status(200).json(result)
   fn.call response, response
 
-module.exports = response
+  response

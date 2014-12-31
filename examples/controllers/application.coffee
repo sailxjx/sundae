@@ -1,4 +1,4 @@
-sundae = require 'sundae'
+sundae = require '../../'
 
 class ApplicationController extends sundae.BaseController
 

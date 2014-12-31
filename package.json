@@ -7,9 +7,6 @@
     "test": "make test",
     "prepublish": "rm -rf lib && coffee -o lib -c src"
   },
-  "bin": {
-    "sundae": "./bin/sundae"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sailxjx/sundae"

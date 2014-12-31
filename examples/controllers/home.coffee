@@ -23,7 +23,7 @@ class HomeController extends ApplicationController
 
   # This is a controller action
   # You can call this function through router
-  index: (req, callback) ->
+  index: (req, res, callback) ->
     callback null,
       welcome: 'Hello World'
       "user-agent": req.get('user-agent')
@@ -32,7 +32,7 @@ class HomeController extends ApplicationController
   # This is a filter function looks like controller actions
   # You can call this function from router
   # But most time you shouldn't do this
-  checkAgent: (req, callback) ->
+  checkAgent: (req, res, callback) ->
     userAgent = req.get('user-agent')
     # If the first param of callback is not null
     # controller.index will not be called

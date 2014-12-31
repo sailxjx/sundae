@@ -1,7 +1,7 @@
 require './sundae'
 require './request'
-require './controller'
 require './response'
+require './controller'
 require './decorator'
 require './backbone'
 require './router'

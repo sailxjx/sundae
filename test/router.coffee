@@ -1,7 +1,7 @@
 should = require 'should'
 express = require 'express'
 supertest = require 'supertest'
-router = require '../src/router'
+Router = require '../src/router'
 request = require '../src/request'
 response = require '../src/response'
 sundae = require '../src/sundae'
@@ -10,18 +10,15 @@ describe 'Router', ->
 
   app = express()
 
-  request.config app
+  request app
 
-  response.config app
+  response app
 
-  router = new router.Router
+  router = Router app
 
-  router.app = app
+  router.ctrlDir = __dirname + '/controllers'
 
   router.callback = (req, res) -> res.json res.result
-
-  # Tell sundae where to load the application
-  sundae.set 'mainPath', __dirname
 
   it 'should register the user resource and initial the routes of user', (done) ->
 
