@@ -7,13 +7,11 @@ beforeAction = require '../src/decorators/before'
 select = require '../src/decorators/select'
 afterAction = require '../src/decorators/after'
 request = require '../src/request'
-response = require '../src/response'
 
 describe 'Decorators#Ensure', ->
 
   app = express()
-
-  before -> request.config app, (req) -> req.allowedKeys = ['name', 'lang']
+  request app, (req) -> req.allowedKeys = ['name', 'lang']
 
   it 'should callback error when params not meet ensures', (done) ->
     app.use (req, res) ->
@@ -32,13 +30,10 @@ describe 'Decorators#Ensure', ->
 
     supertest(app).get('/').end done
 
-  after -> request.config app, (req) -> req.allowedKeys = []
-
 describe 'Decorators#Before', ->
 
   app = express()
-
-  before -> request.config app, (req) -> req.allowedKeys = ['name']
+  request app, (req) -> req.allowedKeys = ['name']
 
   it 'should callback error when use ensureMember before hook', (done) ->
     app.use (req, res) ->
@@ -53,12 +48,11 @@ describe 'Decorators#Before', ->
 
     supertest(app).get('/').end done
 
-  after -> request.config app, (req) -> req.allowedKeys = []
-
 describe 'Decorators#After', ->
 
+  app = express()
+
   it 'should call the after function and get a new property', (done) ->
-    app = express()
     app.use (req, res) ->
       req.ctrlObj =
         isNew: (req, res, result, callback) ->

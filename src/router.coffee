@@ -8,13 +8,14 @@ incubator = require './incubator'
 
 class Router
 
-  constructor: ->
-    @_controllers = {}
+  constructor: (@app) ->
     @_stack = []
 
   middlewares: []
 
   prefix: null
+
+  ctrlDir: process.cwd() + '/controllers'
 
   # Route map of restful requests
   _resource: (ctrl) ->
@@ -96,24 +97,13 @@ class Router
     options.method = 'options'
     @_apply(options)
 
-  # Load and cache controllers
-  _loadCtrl: (ctrl) ->
-    unless @_controllers[ctrl]
-      # Let it crash if controller not found
-      sundae = require './sundae'
-      _mainPath = sundae.get('mainPath')
-      ctrlObj = require p.join _mainPath, "controllers/#{ctrl}"
-      # Cache controller
-      @_controllers[ctrl] = ctrlObj
-    return @_controllers[ctrl]
-
   _apply: (options = {}) ->
     {ctrl, action, method, path, middlewares, callback} = options
     middlewares or= @middlewares
     callback or= @callback
     action or= 'index'
 
-    ctrlObj = @_loadCtrl ctrl
+    ctrlObj = require p.join(@ctrlDir, ctrl)
     return false unless typeof ctrlObj[action] is 'function'
 
     # Bind hooks
@@ -130,7 +120,7 @@ class Router
       ctrl: ctrl
       action: action
 
-    @app?[method] path, (req, res, next) ->
+    @app[method] path, (req, res, next) ->
       # Mix all params to one variable
       _params = _.extend(
         _.clone(req.headers or {})
@@ -164,16 +154,9 @@ class Router
     res.err = err
     res.response err
 
-router = new Router
-
-router.config = (app, fn) ->
-  router.app = app
-  fn? router
-  app.use router.http404
-  app.use router.http500
-
-router.key = 'routes'
-
-router.Router = Router
+router = (app, fn = ->) ->
+  _router = new Router app
+  fn.call app, _router
+  _router
 
 module.exports = router

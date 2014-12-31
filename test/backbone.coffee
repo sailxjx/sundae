@@ -4,7 +4,6 @@ supertest = require 'supertest'
 async = require 'async'
 
 backbone = require '../src/backbone'
-sundae = require '../src/sundae'
 
 describe 'Backbone', ->
 

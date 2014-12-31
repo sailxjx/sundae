@@ -1,6 +1,6 @@
 class HomeMixin
 
-  changeName: (req, result, callback) ->
+  changeName: (req, res, result, callback) ->
     result.welcome = 'Hello Sundae'
     callback null, result
 

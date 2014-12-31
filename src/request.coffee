@@ -1,9 +1,7 @@
-_ = require 'lodash'
-{request} = require 'express'
 Err = require 'err1st'
 
-# Expand express request object
-request.config = (app, fn = ->) ->
+module.exports = (app, fn = ->) ->
+  {request} = app
   # Keys will import as request properties
   request.importKeys = []
 
@@ -60,4 +58,4 @@ request.config = (app, fn = ->) ->
 
   fn.call request, request
 
-module.exports = request
+  request

@@ -3,7 +3,9 @@ sundae
 
 Rtf restful framework for node
 
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Gitter chat][gitter-image]][gitter-url]
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Talk topic][talk-image]][talk-url]
 
 # Intro
 
@@ -92,7 +94,7 @@ class HomeController extends sundae.BaseController
 
   # This is a controller action
   # You can call this function through router
-  index: (req, callback) ->
+  index: (req, res, callback) ->
     callback null,
       welcome: 'Hello World'
       "user-agent": req.get('user-agent')
@@ -101,7 +103,7 @@ class HomeController extends sundae.BaseController
   # This is a filter function looks like controller actions
   # You can call this function from router
   # But most time you shouldn't do this
-  checkAgent: (req, callback) ->
+  checkAgent: (req, res, callback) ->
     userAgent = req.get('user-agent')
     # If the first param of callback is not null
     # controller.index will not be called
@@ -129,6 +131,11 @@ module.exports = new HomeController
 - `skip` option for skipping hooks
 
 # Changelog
+
+## 0.4.0
+- remove `express` in dependencies, you should require express by yourself in application
+- change the initialize functions, for more infomation, check the 'examples' directory
+- remove cli mode
 
 ## 0.3.6
 - use some options in the resource directive, e.g. `ctrl`, `action` ...
@@ -196,5 +203,5 @@ module.exports = new HomeController
 [travis-url]: https://travis-ci.org/sailxjx/sundae
 [travis-image]: http://img.shields.io/travis/sailxjx/sundae.svg
 
-[gitter-url]: https://gitter.im/sailxjx/sundae
-[gitter-image]: https://badges.gitter.im/sailxjx/sundae.png
+[talk-url]: https://guest.talk.ai/rooms/afc690a03b
+[talk-image]: http://img.shields.io/talk/t/afc690a03b.svg
