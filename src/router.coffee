@@ -110,7 +110,7 @@ class Router
     incubator ctrlObj, action
 
     if toString.call(path) is '[object String]' and @prefix
-      path = '/' + p.join(@prefix, path)
+      path = p.join @prefix, path
 
     # Register apis
     @_stack.push
