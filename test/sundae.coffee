@@ -17,3 +17,27 @@ describe 'sundae', ->
     supertest(app).get('/').end (err, res) ->
       res.text.should.eql 'ok'
       done err
+
+  it 'should auto route to the controllers by sundae router', (done) ->
+
+    app = sundae express()
+
+    app.registerController 'home', index: (req, res) -> res.end 'I am from object'
+
+    app.get '/', to: 'home#index'
+
+    supertest(app).get('/').end (err, res) ->
+      res.text.should.eql 'I am from object'
+      done err
+
+  it 'should auto load the controller when defined controller path', (done) ->
+
+    app = sundae express()
+
+    app.setControllerPath __dirname + '/controllers'
+
+    app.get '/', to: 'home#index'
+
+    supertest(app).get('/').end (err, res) ->
+      res.text.should.eql 'I am from file'
+      done err

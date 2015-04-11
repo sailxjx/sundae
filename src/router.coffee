@@ -8,11 +8,11 @@ _parseOptions = (options) ->
   options
 
 _parseArguments = (path, options = {}) ->
-  {ctrl, action, to, middlewares} = _parseOptions(options)
+  {ctrl, action, middlewares} = _parseOptions(options)
   middlewares or= @middlewares
-  controller = @sundae.getController 'ctrl'
+  controller = @getController ctrl.toLowerCase()
   method = controller[action].bind controller
-  [path, middlewares, method]
+  if middlewares then [path, middlewares, method] else [path, method]
 
 _resourceRouter = (ctrl, options = {}) ->
   ctrl = inflection.pluralize(ctrl)

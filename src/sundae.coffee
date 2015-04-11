@@ -1,4 +1,10 @@
 router = require './router'
+constructor = require './constructor'
+
+class Sundae
+
+  constructor: (app) ->
+    app.registerController = (name) ->
 
 _sundae =
   ###*
@@ -8,8 +14,10 @@ _sundae =
   ###
   getController: (ctrl) ->
 
+_sundae = (app) ->
+
 sundae = (app) ->
-  app.sundae = {}
+  constructor app
   # Wrap app with router
   router app
   app
