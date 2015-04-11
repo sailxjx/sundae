@@ -127,8 +127,12 @@ module.exports = new HomeController
 
 # TODO
 
+- set hooked flag on controller functions to prevent apply hooks more than once
 - `transfer` option to call before middlewares
 - `skip` option for skipping hooks
+- use promise to handle the exceptions
+- throw an error when use undefined hook
+- work as express middleware
 
 # Changelog
 
