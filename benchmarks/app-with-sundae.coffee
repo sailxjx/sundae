@@ -1,9 +1,7 @@
 express = require 'express'
 sundae = require '../src/sundae'
 
-app = express()
-
-app.use sundae()
+app = sundae express()
 
 app.get '/', (req, res) -> res.end('ok')
 

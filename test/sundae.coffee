@@ -1,17 +1,19 @@
 should = require 'should'
 supertest = require 'supertest'
 express = require 'express'
-Sundae = require '../src/sundae'
+sundae = require '../src/sundae'
 
-describe 'Sundae', ->
+describe 'sundae', ->
 
-  app = express()
+  it 'load sundae and register resource function on app', (done) ->
 
-  it 'should initial the application and load sundae modules', (done) ->
-    sundae = Sundae(app)
-    sundae.load 'router', require './config/routes'
-    sundae.load 'request'
-    sundae.load 'response'
-    supertest(app).get('/users').end (err, res) ->
-      res.body.forEach (user) -> user.should.have.properties 'name'
+    app = sundae express()
+
+    app.should.have.properties 'resource'
+
+    # The origial app methods should still work
+    app.get '/', (req, res) -> res.end 'ok'
+
+    supertest(app).get('/').end (err, res) ->
+      res.text.should.eql 'ok'
       done err

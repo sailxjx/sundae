@@ -1,13 +1,17 @@
-sundae = (options) ->
+router = require './router'
 
-Sundae = (app) ->
-  throw new Error('App missing') unless app
-  app.sundae = sundae = {}
-  _sundae = (req, res, next) ->
-    next()
-    throw new Error("Module #{loaderName} was not found") unless loader
-    sundae[loaderName] = loader app, configFn
-    sundae
-  sundae
+_sundae =
+  ###*
+   * Get controller instance
+   * @param  {String} ctrl - Controller name
+   * @return {Object} Controller instance
+  ###
+  getController: (ctrl) ->
+
+sundae = (app) ->
+  app.sundae = {}
+  # Wrap app with router
+  router app
+  app
 
 module.exports = sundae
