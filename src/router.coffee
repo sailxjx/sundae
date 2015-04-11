@@ -11,28 +11,20 @@ _parseArguments = (path, options = {}) ->
   {ctrl, action, middlewares} = _parseOptions(options)
   middlewares or= @middlewares
   controller = @getController ctrl.toLowerCase()
-  method = controller[action].bind controller
-  if middlewares then [path, middlewares, method] else [path, method]
+  unless toString.call(controller[action]) is '[object Function]'
+    throw new Error("Action #{ctrl}.#{action} is not exist")
+  handler = controller[action].bind controller
+  if middlewares then [path, middlewares, handler] else [path, handler]
 
 _resourceRouter = (ctrl, options = {}) ->
-  ctrl = inflection.pluralize(ctrl)
+  uriPrefix = inflection.pluralize(ctrl)
 
   resourceMap =
-    readOne:
-      method: 'get'
-      path: "/#{ctrl}/:_id"
-    read:
-      method: 'get'
-      path: "/#{ctrl}"
-    create:
-      method: 'post'
-      path: "/#{ctrl}"
-    update:
-      method: 'put'
-      path: "/#{ctrl}/:_id"
-    remove:
-      method: 'delete'
-      path: "/#{ctrl}/:_id"
+    readOne: method: 'get', path: "/#{uriPrefix}/:_id"
+    read: method: 'get', path: "/#{uriPrefix}"
+    create: method: 'post', path: "/#{uriPrefix}"
+    update: method: 'put', path: "/#{uriPrefix}/:_id"
+    remove: method: 'delete', path: "/#{uriPrefix}/:_id"
 
   app = this
   {only, except} = options
@@ -54,10 +46,20 @@ module.exports = (app) ->
   methods.forEach (method) ->
 
     _fn = app[method]
-    app[method] = ->
-      if arguments.length is 2 and toString.call(arguments[1]) is '[object Object]'
-        return _fn.apply this, _parseArguments.apply(this, arguments)
-      else
-        return _fn.apply this, arguments
+    app[method] = (args...) ->
+      {callback} = app
+
+      if args.length is 2 and toString.call(args[1]) is '[object Object]'
+        args = _parseArguments.apply(this, arguments)
+
+      handler = args[args.length - 1]
+      return _fn.apply this, args unless toString.call(handler) is '[object Function]'
+
+      args[args.length - 1] = (req, res) ->
+        handler req, res, (err, data) ->
+          res.err = err
+          res.data = data
+          callback req, res
+      return _fn.apply this, args
 
   app.resource = _resourceRouter

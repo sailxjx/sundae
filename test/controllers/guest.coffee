@@ -1,7 +1,5 @@
 # A clone version of user controller
-sundae = require '../../src/sundae'
-
-class GuestController extends sundae.BaseController
+class GuestController
 
   readOne: (req, res, callback) ->
     callback null, name: 'Bran'

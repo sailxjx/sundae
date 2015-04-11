@@ -1,7 +1,5 @@
 # Demo user controller for testing
-sundae = require '../../src/sundae'
-
-class UserController extends sundae.BaseController
+class UserController
 
   read: (req, res, callback) ->
     callback null, [{name: 'Grace'}, {name: 'Alice'}]

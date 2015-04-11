@@ -4,7 +4,7 @@ module.exports = (app) ->
 
   controllers = {}
 
-  _controllerPath = null
+  controllerPath = null
 
   app.registerController = (name, controller) ->
     if arguments.length is 1
@@ -20,12 +20,16 @@ module.exports = (app) ->
 
     controllers[name] = controller
 
-  app.setControllerPath = (controllerPath) -> _controllerPath = controllerPath
+  app.setControllerPath = (_controllerPath) -> controllerPath = _controllerPath
 
   app.getController = (name) ->
     unless controllers[name]
       # Load controller when set the controller path
-      throw new Error("Controller path is not settled") unless _controllerPath
-      controllers[name] = require path.join(_controllerPath, name)
+      throw new Error("Controller path is not settled") unless controllerPath
+      controllers[name] = require path.join(controllerPath, name)
     controllers[name]
 
+  app.callback = (req, res) ->
+    {err, data} = res
+    throw err if err
+    res.send data
