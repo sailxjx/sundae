@@ -1,5 +1,5 @@
 require './router'
-# require './request'
+require './request'
 # require './response'
 # require './controller'
 # require './decorator'

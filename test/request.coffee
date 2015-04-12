@@ -2,20 +2,18 @@ should = require 'should'
 express = require 'express'
 async = require 'async'
 supertest = require 'supertest'
+sundae = require '../src/sundae'
 
-request = require '../src/request'
+describe 'Sundae#Request', ->
 
-describe 'Request', ->
+  app = sundae express()
 
-  app = express()
-
-  before ->
-    request app, (req) ->
-      req.importKeys = ['_id']
-      req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
-      req.alias = address: 'location'
-      req.validators = fullname: (fullname) -> fullname.length < 10
-      req.setters = email: (email) -> @email = email
+  req = app.request
+  req.importKeys = ['_id']
+  req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
+  req.alias = address: 'location'
+  req.validators = fullname: (fullname) -> fullname.length < 10
+  req.setters = email: (email) -> @email = email
 
   it 'should apply the alias/validators/setters when call set method', (done) ->
     # Test setters
@@ -49,6 +47,7 @@ describe 'Request', ->
       should(req.get('_id')).eql undefined
 
       res.end 'ok'
-      done()
 
-    supertest(app).get('/').end(->)
+    supertest(app).get('/').end (err, res) ->
+      res.text.should.eql 'ok'
+      done err

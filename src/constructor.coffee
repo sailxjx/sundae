@@ -22,6 +22,11 @@ module.exports = (app) ->
 
   app.setControllerPath = (_controllerPath) -> controllerPath = _controllerPath
 
+  ###*
+   * Get controller instance
+   * @param  {String} ctrl - Controller name
+   * @return {Object} Controller instance
+  ###
   app.getController = (name) ->
     unless controllers[name]
       # Load controller when set the controller path

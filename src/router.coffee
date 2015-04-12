@@ -7,7 +7,7 @@ _parseOptions = (options) ->
   [options.ctrl, options.action] = to.split('#') if to?
   options
 
-_parseArguments = (path, options = {}) ->
+_parseArguments = (path, options) ->
   {ctrl, action, middlewares} = _parseOptions(options)
   middlewares or= @middlewares
   controller = @getController ctrl.toLowerCase()

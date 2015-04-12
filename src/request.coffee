@@ -1,4 +1,4 @@
-module.exports = (app, fn = ->) ->
+module.exports = (app) ->
   {request} = app
   # Keys will import as request properties
   request.importKeys = []
@@ -41,12 +41,7 @@ module.exports = (app, fn = ->) ->
 
     # Validators will filter the value and check for the returned value
     _validator = @validators[key] or @validators['_general']
-
-    if _validator? and not _validator(val, key)
-      err = new Error("Param #{key} is invalid")
-      err.phrase = 'PARAMS_INVALID'
-      err.params = [key]
-      return err
+    return new Error("Param #{key} is invalid") if _validator? and not _validator(val, key)
 
     @_params[key] = val
     @[key] = val if key in @importKeys
@@ -58,7 +53,3 @@ module.exports = (app, fn = ->) ->
       delete @_params[key]
       delete @[key]
     true
-
-  fn.call request, request
-
-  request

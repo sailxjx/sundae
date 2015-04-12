@@ -1,25 +1,11 @@
-router = require './router'
 constructor = require './constructor'
-
-class Sundae
-
-  constructor: (app) ->
-    app.registerController = (name) ->
-
-_sundae =
-  ###*
-   * Get controller instance
-   * @param  {String} ctrl - Controller name
-   * @return {Object} Controller instance
-  ###
-  getController: (ctrl) ->
-
-_sundae = (app) ->
+router = require './router'
+request = require './request'
 
 sundae = (app) ->
   constructor app
-  # Wrap app with router
   router app
+  request app
   app
 
 module.exports = sundae
