@@ -33,8 +33,11 @@ describe 'Sundae#Request', ->
       req.get('location').should.eql 'Shanghai'
 
       # Test validators
-      err = req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
-      err.message.should.eql 'Param fullname is invalid'
+      try
+        req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
+      catch err
+        err.message.should.eql 'Param fullname is invalid'
+
       req.get().should.not.have.properties 'fullname'
 
       # Test setters

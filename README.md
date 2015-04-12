@@ -123,16 +123,13 @@ module.exports = new HomeController
 - `only` only the specific actions will apply hooks
 - `except` all actions will apply hooks without the except actions
 - `parallel` hooks will be parallel executed, the default mode is series (execute one by one)
-- `transfer` transfer the result into expected format before apply hooks
 
 # TODO
 
 - set hooked flag on controller functions to prevent apply hooks more than once
-- `transfer` option to call before middlewares
 - `skip` option for skipping hooks
 - use promise to handle the exceptions
 - throw an error when use undefined hook
-- work as express middleware
 
 # Changelog
 

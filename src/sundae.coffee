@@ -1,9 +1,9 @@
-constructor = require './constructor'
+methods = require './methods'
 router = require './router'
 request = require './request'
 
 sundae = (app) ->
-  constructor app
+  methods app
   router app
   request app
   app

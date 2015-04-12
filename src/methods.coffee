@@ -1,3 +1,5 @@
+# Define methods on app object
+
 path = require 'path'
 
 module.exports = (app) ->

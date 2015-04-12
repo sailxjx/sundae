@@ -22,7 +22,10 @@ describe 'Sundae#Router', ->
 
     app = sundae express()
 
-    app.registerController 'home', index: (req, res) -> res.end 'I am from object'
+    app.registerController 'home', index: (req, res) ->
+      req.ctrl.should.eql 'home'
+      req.action.should.eql 'index'
+      res.end 'I am from object'
 
     app.get '/', to: 'home#index'
 

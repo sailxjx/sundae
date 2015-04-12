@@ -1,3 +1,5 @@
+# Request component
+
 module.exports = (app) ->
   {request} = app
   # Keys will import as request properties
@@ -41,7 +43,8 @@ module.exports = (app) ->
 
     # Validators will filter the value and check for the returned value
     _validator = @validators[key] or @validators['_general']
-    return new Error("Param #{key} is invalid") if _validator? and not _validator(val, key)
+    if _validator? and not _validator(val, key)
+      throw new Error("Param #{key} is invalid")
 
     @_params[key] = val
     @[key] = val if key in @importKeys

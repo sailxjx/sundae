@@ -1,3 +1,5 @@
+# Router component
+
 methods = require 'express/node_modules/methods'
 _ = require 'lodash'
 inflection = require 'inflection'
@@ -7,14 +9,45 @@ _parseOptions = (options) ->
   [options.ctrl, options.action] = to.split('#') if to?
   options
 
-_parseArguments = (path, options) ->
-  {ctrl, action, middlewares} = _parseOptions(options)
-  middlewares or= @middlewares
-  controller = @getController ctrl.toLowerCase()
-  unless toString.call(controller[action]) is '[object Function]'
-    throw new Error("Action #{ctrl}.#{action} is not exist")
-  handler = controller[action].bind controller
-  if middlewares then [path, middlewares, handler] else [path, handler]
+_parseArguments = (args...) ->
+  [path, options] = args
+
+  return args if args.length is 1
+
+  if args.length is 2 and toString.call(options) is '[object Object]'
+    {ctrl, action, middlewares} = _parseOptions(options)
+    middlewares or= @middlewares or []
+    controller = @getController ctrl.toLowerCase()
+    unless toString.call(controller[action]) is '[object Function]'
+      throw new Error("Action #{ctrl}.#{action} is not exist")
+    handler = controller[action].bind controller
+    middlewares.push handler
+  else
+    [path, middlewares...] = args
+
+  # Inject first router middleware to construct request params
+  _prepare = (req, res, next) ->
+    _params = _.assign(
+      {}
+      req.headers or {}
+      req.cookies or {}
+      req.params or {}
+      req.query or {}
+      req.body or {}
+      req.session or {}
+    )
+
+    Object.keys(_params).forEach (key) ->
+      req.set key, _params[key]
+
+    req.ctrl = ctrl
+    req.action = action
+    next()
+
+  middlewares.unshift _prepare
+
+  # [path, _prepare, middleware1, middleware2, action]
+  [path].concat middlewares
 
 _resourceRouter = (ctrl, options = {}) ->
   uriPrefix = inflection.pluralize(ctrl)
@@ -46,11 +79,10 @@ module.exports = (app) ->
   methods.forEach (method) ->
 
     _fn = app[method]
-    app[method] = (args...) ->
+    app[method] = ->
       {callback} = app
 
-      if args.length is 2 and toString.call(args[1]) is '[object Object]'
-        args = _parseArguments.apply(this, arguments)
+      args = _parseArguments.apply this, arguments
 
       handler = args[args.length - 1]
       return _fn.apply this, args unless toString.call(handler) is '[object Function]'
