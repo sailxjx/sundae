@@ -1,13 +1,13 @@
-# Javascript do not support multiple inheritance, so just feel free to use mixins
 _ = require 'lodash'
-util = require './util'
+# util = require './util'
 
-ensure = require './decorators/ensure'
-beforeAction = require './decorators/before'
-afterAction = require './decorators/after'
-select = require './decorators/select'
+# ensure = require './decorators/ensure'
+# beforeAction = require './decorators/before'
+# afterAction = require './decorators/after'
+# select = require './decorators/select'
 
-ignores = ['__super__', 'constructor']
+# ignores = ['__super__', 'constructor']
+
 
 _mix = (base, target) ->
   for key, prop of target
@@ -44,6 +44,16 @@ _registerHooks = (fn, props = []) ->
   # Else it will be treated as a beforeAction function
   if _fn.length is 4 then @_hooks.push _fn else @_hooks.unshift _fn
   return true
+
+
+class Transformer
+
+  trans: ->
+
+module.exports = (fn) ->
+  transformer = new Transformer
+  controller = fn.apply transformer
+  transformer.trans controller
 
 class BaseController
 

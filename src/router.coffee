@@ -1,4 +1,5 @@
 # Router component
+# Modify the routers of express application
 
 methods = require 'express/node_modules/methods'
 _ = require 'lodash'

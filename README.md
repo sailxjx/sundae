@@ -30,20 +30,6 @@ Sundae is a light weight api framework based on express, but more intesting than
   - util            Utility static methods
 ```
 
-# Cli usage
-```
-  Usage: sundae [options] [command]
-
-  Commands:
-
-    init
-       prepare for the application folder
-
-
-  Options:
-
-    -h, --help  output usage information
-```
 # A quick brief of router
 
 You can find this file in `app/config/routes`
@@ -130,6 +116,7 @@ module.exports = new HomeController
 - `skip` option for skipping hooks
 - use promise to handle the exceptions
 - throw an error when use undefined hook
+- add `validator` decorator, `@validator 'name', (name) -> name.length < 10`
 
 # Changelog
 

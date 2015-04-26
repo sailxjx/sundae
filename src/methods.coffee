@@ -2,6 +2,36 @@
 
 path = require 'path'
 
+# Transform a normal controller to a superhero
+transform = (app) ->
+
+  class Controller
+
+    app: app
+
+  controller = new Controller
+
+  _mixins = []
+
+  # Methods used in the contructor of controller
+  decorators =
+    mixin: (args...) -> _mixins = _mixins.concat args
+    ensure: ->
+    before: ->
+    after: ->
+    select: ->
+    # Register action function
+    registerAction: (name, action) ->
+      controller[name] = action
+      _mixins.forEach (_mixin) -> # Do something
+    registerActions: (obj) ->
+      for name, action of obj
+        @registerAction name, action
+
+  _transform = (fn) ->
+    obj = fn.apply decorators
+    decorators.registerActions(obj) if toString.call(obj) is '[object Object]'
+
 module.exports = (app) ->
 
   controllers = {}
@@ -20,6 +50,9 @@ module.exports = (app) ->
     # Remove the controller suffix
     name = name[...-10] if name[-10..] is 'controller'
 
+    if toString.call(controller) is '[object Function]'
+      controller = transform(app)(controller)
+
     controllers[name] = controller
 
   app.setControllerPath = (_controllerPath) -> controllerPath = _controllerPath
@@ -33,7 +66,7 @@ module.exports = (app) ->
     unless controllers[name]
       # Load controller when set the controller path
       throw new Error("Controller path is not settled") unless controllerPath
-      controllers[name] = require path.join(controllerPath, name)
+      app.registerController name, require(path.join(controllerPath, name))
     controllers[name]
 
   app.callback = (req, res) ->

@@ -1,6 +1,5 @@
 should = require 'should'
 express = require 'express'
-async = require 'async'
 supertest = require 'supertest'
 sundae = require '../src/sundae'
 
