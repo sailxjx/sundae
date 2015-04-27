@@ -1,5 +1,3 @@
-Err = require 'err1st'
-
 module.exports = (app, fn = ->) ->
   {request} = app
   # Keys will import as request properties
@@ -43,7 +41,12 @@ module.exports = (app, fn = ->) ->
 
     # Validators will filter the value and check for the returned value
     _validator = @validators[key] or @validators['_general']
-    return new Err('INVALID_PARAMS', key) if _validator? and not _validator(val, key)
+
+    if _validator? and not _validator(val, key)
+      err = new Error("Param #{key} is invalid")
+      err.phrase = 'PARAMS_INVALID'
+      err.params = [key]
+      return err
 
     @_params[key] = val
     @[key] = val if key in @importKeys

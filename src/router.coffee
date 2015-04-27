@@ -2,7 +2,6 @@ _ = require 'lodash'
 async = require 'async'
 inflection = require 'inflection'
 p = require 'path'
-Err = require 'err1st'
 backbone = require './backbone'
 incubator = require './incubator'
 
@@ -143,14 +142,16 @@ class Router
       backbone req, res, callback
 
   http404: (req, res, next) ->
-    err = new Err 'NOT_FOUND'
+    err = new Error 'Not found'
+    err.phrase = 'NOT_FOUND'
     err.status = 404
     res.err = err
     res.response err
 
   http500: (err, req, res, next) ->
     err.status or= 500
-    err.message or= 'INTERNAL_SERVER_ERROR'
+    err.message or= 'Unknown error'
+    err.phrase or= 'UNKNOWN_ERROR'
     res.err = err
     res.response err
 
