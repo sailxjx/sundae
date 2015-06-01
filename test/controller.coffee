@@ -5,101 +5,110 @@ sundae = require '../src/sundae'
 
 describe 'Controller', ->
 
-  app = sundae express()
+  it 'should mix methods from other object by mixin function', ->
 
-  it 'should mix methods from other instance by mixin function', ->
+    app = sundae express()
 
-    class Mixin1
+    Mixin1 = foo1: ->
 
-      foo1: ->
+    Mixin2 = foo2: ->
 
-      @bar1: 'bar1'
+    custom = app.controller 'custom', ->
 
-    class Mixin2
-
-      foo2: ->
-
-      @bar2: 'bar2'
-
-    class CustomController
-
-      custom: ->
-
-    custom = app.registerController 'custom', ->
       @mixin Mixin1, Mixin2
-      new CustomController
 
-    custom.constructor.should.have.properties 'bar1', 'bar2'
-    custom.should.have.properties 'foo1', 'foo2', 'custom'
+      @action 'custom', ->
 
-  # # Test for controller options
-  # it 'should test for the only/except option', (done) ->
-  #   app = express()
+    custom._actions.should.have.properties 'foo1', 'foo2', 'custom'
 
-  #   class Custom extends BaseController
+  it 'should only apply the hook in the only options (in pre hook)', ->
 
-  #     @ensure '_userId', only: 'readOne'
+    app = sundae express()
 
-  #     read: (req, res, callback) -> callback null, ok: 1
+    app.decorator 'guard', (options) ->
+      options.hookFunc = (req, res, result, callback) ->
+        callback new Error('Should not pass')
+      @_postHook options
 
-  #     readOne: (req, res, callback) -> callback null, ok: 1
+    custom = app.controller 'custom', ->
 
-  #   app.use (req, res, next) ->
-  #     req.ctrlObj = new Custom
-  #     req.action = req.path[1..]
+      @guard only: 'readOne'
 
-  #     incubator req.ctrlObj, req.action
+      @action 'read', (req, res, callback) -> callback null, 'ok'
 
-  #     backbone req, res, (req, res) ->
-  #       res.json res.err or res.result
+      @action 'readOne', (req, res, callback) -> callback null, 'ok'
 
-  #   async.parallel [
-  #     (next) ->
-  #       supertest app
-  #         .get '/read'
-  #         .end (err, res) ->
-  #           should(res.body.ok).eql 1
-  #           next err
-  #     (next) ->
-  #       supertest app
-  #         .get '/readOne'
-  #         .end (err, res) ->
-  #           should(res.body.ok).eql undefined
-  #           next err
-  #   ], done
+    custom.call 'read', {}, {}, (err, body) -> body.should.eql 'ok'
 
-  # it 'should test for the parallel option', (done) ->
+    custom.call 'readOne', {}, {}, (err) -> err.message.should.eql 'Should not pass'
 
-  #   app = express()
+  it 'should not apply excepted hooks (in post hook)', ->
 
-  #   sleeped = false
+    app = sundae express()
 
-  #   class Custom extends BaseController
+    app.decorator 'guard', (options) ->
+      options.hookFunc = (req, res, result, callback) ->
+        callback new Error('Should not pass')
+      @_postHook options
 
-  #     @after 'sleep20ms', parallel: true
+    custom = app.controller 'custom', ->
 
-  #     read: (req, res, callback) -> callback null, ok: 1
+      @guard except: 'read'
 
-  #     sleep20ms: (req, res) ->
-  #       setTimeout ->
-  #         sleeped = true
-  #       , 20
+      @action 'read', (req, res, callback) -> callback null, 'ok'
 
-  #   app.use (req, res, next) ->
-  #     req.ctrlObj = new Custom
-  #     req.action = 'read'
+      @action 'readOne', (req, res, callback) -> callback null, 'ok'
 
-  #     incubator req.ctrlObj, req.action
+    custom.call 'read', {}, {}, (err, body) -> body.should.eql 'ok'
 
-  #     backbone req, res, (req, res) -> res.json res.result
+    custom.call 'readOne', {}, {}, (err) -> err.message.should.eql 'Should not pass'
 
-  #   supertest app
-  #     .get '/read'
-  #     .end (err, res) ->
-  #       # AfterAction not executed
-  #       sleeped.should.eql false
-  #       # Wait 30ms
-  #       setTimeout ->
-  #         sleeped.should.eql true
-  #         done()
-  #       , 30
+  it 'should test for the parallel option', (done) ->
+
+    app = sundae express()
+
+    sleeped = false
+
+    app.decorator 'postHook', (options) ->
+      options.hookFunc = (req, res, result, callback) ->
+        setTimeout ->
+          sleeped = true
+        , 20
+
+      @_postHook options
+
+    custom = app.controller 'custom', ->
+
+      @postHook parallel: true
+
+      @action 'read', (req, res, callback) -> callback null, 'ok'
+
+    custom.call 'read', {}, {}, (err, body) ->
+      body.should.eql 'ok'
+      # sleep20ms is not executed
+      sleeped.should.eql false
+      setTimeout ->
+        sleeped.should.eql true
+        done()
+      , 30
+
+  it 'should not call the hook on the same action more than once', ->
+
+    app = sundae express()
+
+    calledNum = 0
+
+    custom = app.controller 'custom', ->
+
+      @action 'incr', (req, res, callback) ->
+        calledNum += 1
+        callback()
+
+      @action 'read', (req, res, callback) -> callback null, calledNum
+
+      # Register two incr hook
+      @_preHook hookFunc: @action 'incr'
+
+      @_preHook hookFunc: @action 'incr'
+
+    custom.call 'read', {}, {}, (err, calledNum) -> calledNum.should.eql 1

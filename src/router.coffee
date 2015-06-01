@@ -1,7 +1,11 @@
 # Router component
 # Modify the routers of express application
 
-methods = require 'express/node_modules/methods'
+try
+  methods = require 'express/node_modules/methods'
+catch e
+  console.warn "Express is not installed"
+  methods = [ 'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol', 'move', 'purge', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout', 'merge', 'm-search', 'notify', 'subscribe', 'unsubscribe', 'patch', 'search', 'connect' ]
 _ = require 'lodash'
 inflection = require 'inflection'
 

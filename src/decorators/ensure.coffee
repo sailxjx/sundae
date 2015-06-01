@@ -2,17 +2,18 @@
 # Or response error messages when miss some param
 util = require '../util'
 
-ensure = (ensures) ->
-  ensures = util._toArray ensures
+module.exports = ensure = (ensureKeys, options) ->
 
-  return (req, res, callback = ->) ->
-    missings = []
-    ensures.forEach (_ensure) -> missings.push(_ensure) unless req.get(_ensure)?
-    if missings.length > 0
-      err = new Error("Params #{missings.join(', ')} missing")
+  ensureKeys = util.toArray ensureKeys
+
+  options.hookFunc = (req, res, callback) ->
+    missingKeys = []
+    ensureKeys.forEach (ensureKey) -> missingKeys.push(ensureKey) unless req.get(ensureKey)?
+    if missingKeys.length > 0
+      err = new Error("Params #{missingKeys.join(', ')} missing")
       err.phrase = 'PARAMS_MISSING'
-      err.params = [missings.join(', ')]
+      err.params = missingKeys
       return callback err
-    callback(null)
+    callback null
 
-module.exports = ensure
+  @_preHook options

@@ -1,5 +1,5 @@
-require './router'
-require './request'
-# require './controller'
+# require './router'
+# require './request'
+require './controller'
 # require './decorator'
 # require './backbone'

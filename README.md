@@ -117,6 +117,7 @@ module.exports = new HomeController
 - use promise to handle the exceptions
 - throw an error when use undefined hook
 - add `validator` decorator, `@validator 'name', (name) -> name.length < 10`
+- use `actionWrapper` to wrap each action and generate their scope
 
 # Changelog
 
