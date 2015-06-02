@@ -26,10 +26,8 @@
     "url": "https://github.com/sailxjx/sundae/issues"
   },
   "devDependencies": {
-    "coffee-coverage": "^0.6.0",
     "coffee-script": "^1.9.3",
     "express": "^4.12.4",
-    "istanbul": "^0.3.14",
     "mocha": "^2.2.5",
     "should": "^6.0.3",
     "supertest": "^1.0.1"

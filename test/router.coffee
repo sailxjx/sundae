@@ -67,3 +67,38 @@ describe 'Sundae#Router', ->
     supertest(app).get('/users/1').end (err, res) ->
       res.body.name.should.eql 'Bran'
       done err
+
+  it 'should work with routePrefix', (done) ->
+
+    app = sundae express()
+
+    app.controller 'home', ->
+
+      @action 'index', (req, res, callback) -> callback null, path: 'home'
+
+    app.routePrefix = '/v1'
+
+    app.get 'home', to: 'home#index'
+
+    supertest(app).get('/v1/home').end (err, res) ->
+      res.body.path.should.eql 'home'
+      done err
+
+  it 'should work with routeCallback', (done) ->
+
+    app = sundae express()
+
+    app.controller 'home', ->
+
+      @action 'index', (req, res, callback) -> callback null, path: 'home'
+
+    app.routeCallback = (req, res) ->
+      {err, result} = res
+      result.path = 'new ' + result.path
+      res.status(200).json(result)
+
+    app.get '/home', to: 'home#index'
+
+    supertest(app).get('/home').end (err, res) ->
+      res.body.path.should.eql 'new home'
+      done err

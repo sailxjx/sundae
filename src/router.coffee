@@ -1,12 +1,15 @@
 # Router component
 # Modify the routers of express application
 
+pathLib = require 'path'
+
 try
   methods = require 'express/node_modules/methods'
 catch e
   console.warn "Express is not installed"
   methods = [ 'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol', 'move', 'purge', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout', 'merge', 'm-search', 'notify', 'subscribe', 'unsubscribe', 'patch', 'search', 'connect' ]
 _ = require 'lodash'
+
 inflection = require 'inflection'
 util = require './util'
 
@@ -17,50 +20,6 @@ _parseOptions = (options) ->
   options.except = util.toArray except
 
   options
-
-_parseArguments = (args...) ->
-  app = this
-  [path, options] = args
-
-  return args if args.length is 1
-
-  if args.length is 2 and toString.call(options) is '[object Object]'
-    {ctrl, action, middlewares} = _parseOptions options
-    actionName = action.toLowerCase()
-    ctrlName = ctrl.toLowerCase()
-    middlewares or= @middlewares or []
-
-    controller = app.controller ctrlName
-    # Check whether the action exists
-    actionFunc = controller.action actionName
-
-    middlewares.push controller.call.bind controller, actionName
-  else
-    [path, middlewares...] = args
-
-  # Inject first router middleware to construct request params
-  _prepare = (req, res, next) ->
-    _params = _.assign(
-      {}
-      req.headers or {}
-      req.cookies or {}
-      req.params or {}
-      req.query or {}
-      req.body or {}
-      req.session or {}
-    )
-
-    for key, val of _params
-      req.set key, val, true
-
-    req.ctrl = ctrl
-    req.action = action
-    next()
-
-  middlewares.unshift _prepare
-
-  # [path, _prepare, middleware1, middleware2, action]
-  [path].concat middlewares
 
 _resourceRouter = (ctrl, options = {}) ->
   app = this
@@ -89,18 +48,76 @@ _resourceRouter = (ctrl, options = {}) ->
 
 module.exports = (app) ->
 
+  app.routeStack = []
+
   methods.forEach (method) ->
 
     _fn = app[method]
-    app[method] = ->
 
-      callback = app.callback or (req, res) ->
+    _parseArguments = (args...) ->
+      app = this
+      [path, options] = args
+
+      return args if args.length is 1
+
+      if args.length is 2 and toString.call(options) is '[object Object]'
+        {ctrl, action, middlewares} = _parseOptions options
+        actionName = action.toLowerCase()
+        ctrlName = ctrl.toLowerCase()
+        middlewares or= @middlewares or []
+
+        controller = app.controller ctrlName
+        # Check whether the action exists
+        actionFunc = controller.action actionName
+
+        middlewares.push controller.call.bind controller, actionName
+
+        app.routeStack.push
+          ctrl: ctrlName
+          action: actionName
+          path: path
+          method: method
+
+      else
+        [path, middlewares...] = args
+
+      # Inject first router middleware to construct request params
+      _prepare = (req, res, next) ->
+        _params = _.assign(
+          {}
+          req.headers or {}
+          req.cookies or {}
+          req.params or {}
+          req.query or {}
+          req.body or {}
+          req.session or {}
+        )
+
+        for key, val of _params
+          req.set key, val, true
+
+        req.ctrl = ctrl
+        req.action = action
+        next()
+
+      middlewares.unshift _prepare
+
+      # [path, _prepare, middleware1, middleware2, action]
+      [path].concat middlewares
+
+    app[method] = (path) ->
+
+      callback = app.routeCallback or (req, res) ->
         if res.err
           res.status(500).json
             code: @err.code
             message: @err.message
         else if res.result
           res.status(200).json res.result
+
+      # Add global prefix on each route
+      if toString.call(path) is '[object String]' and app.routePrefix
+        arguments[0] = pathLib.join app.routePrefix, path
 
       args = _parseArguments.apply this, arguments
 

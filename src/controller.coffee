@@ -101,8 +101,8 @@ class Controller
         actionFunc.call actions, req, res, (err, result) ->
           return callback(err) if err
           if parallel
-            hookFunc.call actions, req, res, result
             callback err, result
+            hookFunc.call actions, req, res, result
           else
             hookFunc.call actions, req, res, result, callback
 
