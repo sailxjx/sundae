@@ -56,21 +56,23 @@ module.exports = (app) ->
 
     _parseArguments = (args...) ->
       app = this
+      _middlewares = []
       [path, options] = args
 
       return args if args.length is 1
 
       if args.length is 2 and toString.call(options) is '[object Object]'
         {ctrl, action, middlewares} = _parseOptions options
+        action or= 'index'
         actionName = action.toLowerCase()
         ctrlName = ctrl.toLowerCase()
-        middlewares or= @middlewares or []
+        _middlewares = [].concat middlewares or @middlewares or []
 
         controller = app.controller ctrlName
         # Check whether the action exists
         actionFunc = controller.action actionName
 
-        middlewares.push controller.call.bind controller, actionName
+        _middlewares.push controller.call.bind controller, actionName
 
         app.routeStack.push
           ctrl: ctrlName
@@ -78,8 +80,7 @@ module.exports = (app) ->
           path: path
           method: method
 
-      else
-        [path, middlewares...] = args
+      else [path, _middlewares...] = args
 
       # Inject first router middleware to construct request params
       _prepare = (req, res, next) ->
@@ -100,10 +101,10 @@ module.exports = (app) ->
         req.action = action
         next()
 
-      middlewares.unshift _prepare
+      _middlewares.unshift _prepare
 
       # [path, _prepare, middleware1, middleware2, action]
-      [path].concat middlewares
+      [path].concat _middlewares
 
     app[method] = (path) ->
 
@@ -121,11 +122,12 @@ module.exports = (app) ->
 
       args = _parseArguments.apply this, arguments
 
-      handler = args[args.length - 1]
-      return _fn.apply this, args unless toString.call(handler) is '[object Function]'
+      actionFunc = args[args.length - 1]
+
+      return _fn.apply this, args unless toString.call(actionFunc) is '[object Function]'
 
       args[args.length - 1] = (req, res) ->
-        handler req, res, (err, result) ->
+        actionFunc req, res, (err, result) ->
           res.err = err
           res.result = result
           callback req, res

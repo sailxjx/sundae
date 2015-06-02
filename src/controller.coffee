@@ -26,11 +26,15 @@ class Controller
       throw new Error("Can not redefine action #{actionName}")
 
     unless @_actions[actionName]
-      if toString.call(actionFunc) isnt '[object Function]'
-        throw new Error("Type of action #{actionName} is not function")
-      actionFunc.funcId = _funcId += 1
+      if toString.call(actionFunc) is '[object Function]'
+        actionFunc.funcId = _funcId += 1
       @_actions[actionName] = actionFunc
     @_actions[actionName]
+
+  actions: (actions = {}) ->
+    for actionName, actionFunc of actions
+      @action actionName, actionFunc
+    return @_actions
 
   call: (actionName, req, res, callback) ->
     unless @_wrappedActions[actionName]

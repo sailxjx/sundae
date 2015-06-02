@@ -102,3 +102,33 @@ describe 'Sundae#Router', ->
     supertest(app).get('/home').end (err, res) ->
       res.body.path.should.eql 'new home'
       done err
+
+  it 'handle http 404 route', (done) ->
+
+    app = sundae express()
+
+    app.use (req, res, callback) -> res.status(404).json message: 'Not found'
+
+    supertest(app).get('/').end (err, res) ->
+      res.statusCode.should.eql 404
+      res.body.message.should.eql 'Not found'
+      done()
+
+  it 'handle server error', (done) ->
+
+    app = sundae express()
+
+    app.controller 'home', ->
+
+      @action 'index', (req, res, callback) -> throw new Error('Unknown error')
+
+    app.get '/', to: 'home#index'
+
+    app.use (err, req, res, callback) ->
+
+      res.status(500).json message: err.message
+
+    supertest(app).get('/').end (err, res) ->
+      res.statusCode.should.eql 500
+      res.body.message.should.eql 'Unknown error'
+      done()
