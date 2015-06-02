@@ -23,7 +23,7 @@ module.exports = (app) ->
   # @param {String} key
   # @return {Mixed} value
   request.get = (key) ->
-    @_params = {} unless @_params?
+    @_params or= {}
     return if key? then @_params[key] else @_params
 
   # Set params in request object
@@ -32,7 +32,7 @@ module.exports = (app) ->
   # @param {Boolean} `onlyAllowed` only use allowed keys
   # @return {Object} request object
   request.set = (key, val, onlyAllowed = false) ->
-    @_params = {} unless @_params?
+    @_params or= {}
     aliasKey = @alias[key.toLowerCase()]
     key = aliasKey if aliasKey?
 

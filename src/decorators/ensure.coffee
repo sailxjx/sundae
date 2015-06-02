@@ -1,8 +1,8 @@
 # Ensure declared params
-# Or response error messages when miss some param
+# Or response error messages when missing some param
 util = require '../util'
 
-module.exports = ensure = (ensureKeys, options) ->
+module.exports = ensure = (ensureKeys, options = {}) ->
 
   ensureKeys = util.toArray ensureKeys
 

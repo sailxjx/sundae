@@ -1,6 +1,5 @@
 should = require 'should'
 express = require 'express'
-supertest = require 'supertest'
 sundae = require '../src/sundae'
 
 describe 'Controller', ->

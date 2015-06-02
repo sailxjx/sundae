@@ -8,25 +8,33 @@ catch e
   methods = [ 'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol', 'move', 'purge', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout', 'merge', 'm-search', 'notify', 'subscribe', 'unsubscribe', 'patch', 'search', 'connect' ]
 _ = require 'lodash'
 inflection = require 'inflection'
+util = require './util'
 
 _parseOptions = (options) ->
-  {to} = options
+  {to, only, except} = options
   [options.ctrl, options.action] = to.split('#') if to?
+  options.only = util.toArray only
+  options.except = util.toArray except
+
   options
 
 _parseArguments = (args...) ->
+  app = this
   [path, options] = args
 
   return args if args.length is 1
 
   if args.length is 2 and toString.call(options) is '[object Object]'
-    {ctrl, action, middlewares} = _parseOptions(options)
+    {ctrl, action, middlewares} = _parseOptions options
+    actionName = action.toLowerCase()
+    ctrlName = ctrl.toLowerCase()
     middlewares or= @middlewares or []
-    controller = @getController ctrl.toLowerCase()
-    unless toString.call(controller[action]) is '[object Function]'
-      throw new Error("Action #{ctrl}.#{action} is not exist")
-    handler = controller[action].bind controller
-    middlewares.push handler
+
+    controller = app.controller ctrlName
+    # Check whether the action exists
+    actionFunc = controller.action actionName
+
+    middlewares.push controller.call.bind controller, actionName
   else
     [path, middlewares...] = args
 
@@ -42,8 +50,8 @@ _parseArguments = (args...) ->
       req.session or {}
     )
 
-    Object.keys(_params).forEach (key) ->
-      req.set key, _params[key]
+    for key, val of _params
+      req.set key, val, true
 
     req.ctrl = ctrl
     req.action = action
@@ -55,6 +63,7 @@ _parseArguments = (args...) ->
   [path].concat middlewares
 
 _resourceRouter = (ctrl, options = {}) ->
+  app = this
   uriPrefix = inflection.pluralize(ctrl)
 
   resourceMap =
@@ -64,8 +73,7 @@ _resourceRouter = (ctrl, options = {}) ->
     update: method: 'put', path: "/#{uriPrefix}/:_id"
     remove: method: 'delete', path: "/#{uriPrefix}/:_id"
 
-  app = this
-  {only, except} = options
+  {only, except} = _parseOptions options
   if only
     resourceMap = _.pick resourceMap, only
   else if except
@@ -73,7 +81,7 @@ _resourceRouter = (ctrl, options = {}) ->
 
   Object.keys(resourceMap).forEach (action) ->
     {method, path} = resourceMap[action]
-    _options = _.extend
+    _options = _.assign
       ctrl: ctrl
       action: action
     , options
@@ -85,7 +93,14 @@ module.exports = (app) ->
 
     _fn = app[method]
     app[method] = ->
-      {callback} = app
+
+      callback = app.callback or (req, res) ->
+        if res.err
+          res.status(500).json
+            code: @err.code
+            message: @err.message
+        else if res.result
+          res.status(200).json res.result
 
       args = _parseArguments.apply this, arguments
 
@@ -93,9 +108,9 @@ module.exports = (app) ->
       return _fn.apply this, args unless toString.call(handler) is '[object Function]'
 
       args[args.length - 1] = (req, res) ->
-        handler req, res, (err, data) ->
+        handler req, res, (err, result) ->
           res.err = err
-          res.data = data
+          res.result = result
           callback req, res
       return _fn.apply this, args
 

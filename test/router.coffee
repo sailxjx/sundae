@@ -22,46 +22,31 @@ describe 'Sundae#Router', ->
 
     app = sundae express()
 
-    app.registerController 'home', index: (req, res) ->
-      req.ctrl.should.eql 'home'
-      req.action.should.eql 'index'
-      res.end 'I am from object'
+    app.controller 'home', ->
+      @action 'index', (req, res) ->
+        req.ctrl.should.eql 'home'
+        req.action.should.eql 'index'
+        res.end 'ok'
 
     app.get '/', to: 'home#index'
 
     supertest(app).get('/').end (err, res) ->
-      res.text.should.eql 'I am from object'
-      done err
-
-  it 'should auto load the controller when defined controller path', (done) ->
-
-    app = sundae express()
-
-    app.setControllerPath __dirname + '/controllers'
-
-    app.get '/', to: 'home#index'
-
-    supertest(app).get('/').end (err, res) ->
-      res.text.should.eql 'I am from file'
-      done err
-
-  it 'should generate the response by the callback data', (done) ->
-
-    app = sundae express()
-
-    app.registerController 'home', index: (req, res, callback) -> callback null, 'I am from callback'
-
-    app.get '/', to: 'home#index'
-
-    supertest(app).get('/').end (err, res) ->
-      res.text.should.eql 'I am from callback'
+      res.text.should.eql 'ok'
       done err
 
   it 'should register the user resource', (done) ->
 
     app = sundae express()
 
-    app.setControllerPath __dirname + '/controllers'
+    app.controller 'user', ->
+      @action 'read', (req, res, callback) ->
+        callback null, [{name: 'Xiaolaba'}]
+
+      @action 'readOne', (req, res, callback) ->
+        callback null, name: 'Xiaolaba'
+
+      @action 'create', (req, res, callback) ->
+        callback null, name: 'Xiaolaba'
 
     app.resource 'user', only: ['read', 'readOne']
 
@@ -73,7 +58,9 @@ describe 'Sundae#Router', ->
 
     app = sundae express()
 
-    app.setControllerPath __dirname + '/controllers'
+    app.controller 'guest', ->
+      @action 'readOne', (req, res, callback) ->
+        callback null, name: 'Bran'
 
     app.resource 'users', ctrl: 'guest', only: ['readOne']
 

@@ -5,28 +5,28 @@ util = require '../util'
 # Convert mongoose object to pure JSON
 toJSON = (obj) -> return if obj.toJSON then obj.toJSON() else obj
 
-select = (fields) ->
+module.exports = select = (selectKeys, options = {}) ->
 
-  fields = util._toArray fields
+  selectKeys = util.toArray selectKeys
 
-  return (req, res, result, callback = ->) ->
+  pickKeys = []
+  omitKeys = []
 
-    picks = []
-    omits = []
+  selectKeys.forEach (field) ->
+    if field.charAt(0) is '-'
+      omitKeys.push field[1..]
+    else if field.charAt(0) is '+'
+      pickKeys.push field[1..]
+    else
+      pickKeys.push field
 
-    fields.forEach (field) ->
-      if field.indexOf('-') is 0
-        omits.push field[1..]
-      else if field.indexOf('+') is 0
-        picks.push field[1..]
-      else
-        picks.push field
+  options.hookFunc =  (req, res, result, callback = ->) ->
 
     _select = (result) ->
       result = toJSON result
       return result unless toString.call(result) is '[object Object]'
-      result = _.pick result, picks if picks.length
-      result = _.omit result, omits if omits.length
+      result = _.pick result, pickKeys if pickKeys.length
+      result = _.omit result, omitKeys if omitKeys.length
       return result
 
     if toString.call(result) is '[object Array]'
@@ -36,4 +36,4 @@ select = (fields) ->
     else
       callback null, result
 
-module.exports = select
+  @_postHook options

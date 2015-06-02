@@ -1,14 +1,21 @@
 # Hooks before action executed
 
-before = (method) ->
+module.exports = before = (preActionName, options = {}) ->
 
-  return (req, res, callback = ->) ->
-    {ctrlObj} = req
-    fn = ctrlObj[method]
-    return callback() unless typeof fn is 'function'
-    if fn.length is 3
-      fn.call ctrlObj, req, res, callback
-    else
-      fn.call ctrlObj, req, callback
+  controller = this
 
-module.exports = before
+  if toString.call(preActionName) is '[object Function]'
+    options.hookFunc = preActionName
+
+  else if toString.call(preActionName) is '[object String]'
+    options.hookFunc = (req, res, callback) ->
+      actionFunc = controller.action preActionName
+      unless toString.call(actionFunc) is '[object Function]'
+        throw new Error "Action #{preActionName} is not exist"
+      actionFunc.call controller._actions, req, res, callback
+    options.hookName = preActionName
+
+  else
+    throw new Error "Invalid post action name"
+
+  @_preHook options

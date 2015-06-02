@@ -1,5 +1,5 @@
+_ = require 'lodash'
 util = require './util'
-utilLib = require 'util'
 
 # Generate an id for each hook or action
 _funcId = 0
@@ -20,6 +20,8 @@ class Controller
     @_wrappedActions = {}
 
   action: (actionName, actionFunc) ->
+    actionName = actionName.toLowerCase()
+
     if @_actions[actionName] and actionFunc
       throw new Error("Can not redefine action #{actionName}")
 
@@ -38,12 +40,12 @@ class Controller
 
   _preHook: (options) ->
     options.hookFunc.funcId or= _funcId += 1
-    _options = utilLib._extend {}, options
+    _options = _.assign {}, options
     @_preHooks.push _normalizeOptions _options
 
   _postHook: (options) ->
     options.hookFunc.funcId or= _funcId += 1
-    _options = utilLib._extend {}, options
+    _options = _.assign {}, options
     @_postHooks.push _normalizeOptions _options
 
   ###*
@@ -62,10 +64,11 @@ class Controller
     _calledFuncIds = []
 
     _preCheck = (actionFunc, options) ->
-      {hookFunc, only, except, parallel} = options
+      {hookFunc, only, except, parallel, hookName} = options
       return actionFunc if except.length > 0 and actionName in except
       return actionFunc if only.length > 0 and actionName not in only
       return actionFunc if hookFunc.funcId in _calledFuncIds
+      return actionFunc if hookName is actionName
 
     actionFunc = @_preHooks.reduce (actionFunc, options) ->
       {hookFunc, only, except, parallel} = options
@@ -112,8 +115,9 @@ class Controller
 module.exports = controller = (app) ->
   _controllers = {}
   app.controller = (ctrlName, ctrlFunc) ->
+    ctrlName = ctrlName.toLowerCase()
     unless _controllers[ctrlName]
       _controllers[ctrlName] = new Controller ctrlName
-    utilLib._extend _controllers[ctrlName], app._decorators
+    _.assign _controllers[ctrlName], app._decorators
     ctrlFunc?.apply _controllers[ctrlName], _controllers[ctrlName]
     _controllers[ctrlName]
