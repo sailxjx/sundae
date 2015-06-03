@@ -33,7 +33,7 @@ module.exports = (app) ->
   # @return {Object} request object
   request.set = (key, val, onlyAllowed = false) ->
     @_params or= {}
-    aliasKey = @alias[key.toLowerCase()]
+    aliasKey = @alias[key?.toLowerCase()]
     key = aliasKey if aliasKey?
 
     if typeof @setters[key] is 'function'

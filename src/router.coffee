@@ -60,8 +60,8 @@ _parseArguments = (method) ->
     if args.length is 2 and toString.call(options) is '[object Object]'
       {ctrl, action, middlewares} = _parseOptions options
       action or= 'index'
-      actionName = action.toLowerCase()
-      ctrlName = ctrl.toLowerCase()
+      actionName = action
+      ctrlName = ctrl
       _middlewares = [].concat middlewares or @middlewares or []
 
       controller = app.controller ctrlName

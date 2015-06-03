@@ -1,13 +1,14 @@
 _ = require 'lodash'
 util = require './util'
+{slice} = Array.prototype
 
 # Generate an id for each hook or action
 _funcId = 0
 
 _normalizeOptions = (options = {}) ->
   {only, except} = options
-  options.only = util.toArray(only).map (str) -> str.toLowerCase()
-  options.except = util.toArray(except).map (str) -> str.toLowerCase()
+  options.only = util.toArray only
+  options.except = util.toArray except
   options.parallel or= false
   return options
 
@@ -20,14 +21,12 @@ class Controller
     @_wrappedActions = {}
 
   action: (actionName, actionFunc) ->
-    actionName = actionName.toLowerCase()
-
     if @_actions[actionName] and actionFunc
       throw new Error("Can not redefine action #{actionName}")
 
     unless @_actions[actionName]
       if toString.call(actionFunc) is '[object Function]'
-        actionFunc.funcId = _funcId += 1
+        actionFunc.funcId or= _funcId += 1
       @_actions[actionName] = actionFunc
     @_actions[actionName]
 
@@ -37,18 +36,17 @@ class Controller
     return @_actions
 
   call: (actionName, req, res, callback) ->
-    actionName = actionName.toLowerCase()
     unless @_wrappedActions[actionName]
       @_wrappedActions[actionName] = @_wrapAction actionName
     actions = @_actions
-    @_wrappedActions[actionName].call actions, req, res, callback
+    @_wrappedActions[actionName].apply actions, slice.call arguments, 1
 
-  _preHook: (options) ->
+  preHook: (options) ->
     options.hookFunc.funcId or= _funcId += 1
     _options = _.assign {}, options
-    @_preHooks.push _normalizeOptions _options
+    @_preHooks.unshift _normalizeOptions _options
 
-  _postHook: (options) ->
+  postHook: (options) ->
     options.hookFunc.funcId or= _funcId += 1
     _options = _.assign {}, options
     @_postHooks.push _normalizeOptions _options
@@ -120,7 +118,6 @@ class Controller
 module.exports = controller = (app) ->
   _controllers = {}
   app.controller = (ctrlName, ctrlFunc) ->
-    ctrlName = ctrlName.toLowerCase()
     unless _controllers[ctrlName]
       _controllers[ctrlName] = new Controller ctrlName
     _.assign _controllers[ctrlName], app._decorators

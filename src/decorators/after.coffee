@@ -18,4 +18,4 @@ module.exports = after = (postActionName, options = {}) ->
   else
     throw new Error "Invalid post action name"
 
-  @_postHook options
+  @postHook options

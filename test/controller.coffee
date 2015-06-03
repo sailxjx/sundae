@@ -27,7 +27,7 @@ describe 'Controller', ->
     app.decorator 'guard', (options) ->
       options.hookFunc = (req, res, result, callback) ->
         callback new Error('Should not pass')
-      @_postHook options
+      @postHook options
 
     custom = app.controller 'custom', ->
 
@@ -48,7 +48,7 @@ describe 'Controller', ->
     app.decorator 'guard', (options) ->
       options.hookFunc = (req, res, result, callback) ->
         callback new Error('Should not pass')
-      @_postHook options
+      @postHook options
 
     custom = app.controller 'custom', ->
 
@@ -68,17 +68,17 @@ describe 'Controller', ->
 
     sleeped = false
 
-    app.decorator 'postHook', (options) ->
+    app.decorator 'sleep', (options) ->
       options.hookFunc = (req, res, result, callback) ->
         setTimeout ->
           sleeped = true
         , 20
 
-      @_postHook options
+      @postHook options
 
     custom = app.controller 'custom', ->
 
-      @postHook parallel: true
+      @sleep parallel: true
 
       @action 'read', (req, res, callback) -> callback null, 'ok'
 
@@ -106,8 +106,28 @@ describe 'Controller', ->
       @action 'read', (req, res, callback) -> callback null, calledNum
 
       # Register two incr hook
-      @_preHook hookFunc: @action 'incr'
+      @preHook hookFunc: @action 'incr'
 
-      @_preHook hookFunc: @action 'incr'
+      @preHook hookFunc: @action 'incr'
 
     custom.call 'read', {}, {}, (err, calledNum) -> calledNum.should.eql 1
+
+  it 'should apply the hooks in current order', ->
+
+    app = sundae express()
+
+    appliedHooks = ''
+
+    custom = app.controller 'custom', ->
+
+      @preHook hookFunc: (req, res, callback) -> callback null, appliedHooks += '1'
+
+      @preHook hookFunc: (req, res, callback) -> callback null, appliedHooks += '2'
+
+      @postHook hookFunc: (req, res, result, callback) -> callback null, appliedHooks += '4'
+
+      @postHook hookFunc: (req, res, result, callback) -> callback null, appliedHooks += '5'
+
+      @action 'read', (req, res, callback) -> callback null, appliedHooks += '3'
+
+    custom.call 'read', {}, {}, (err, result) -> result.should.eql '12345'

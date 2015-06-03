@@ -16,4 +16,4 @@ module.exports = ensure = (ensureKeys, options = {}) ->
       return callback err
     callback null
 
-  @_preHook options
+  @preHook options

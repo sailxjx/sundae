@@ -36,4 +36,4 @@ module.exports = select = (selectKeys, options = {}) ->
     else
       callback null, result
 
-  @_postHook options
+  @postHook options
