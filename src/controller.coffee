@@ -6,8 +6,8 @@ _funcId = 0
 
 _normalizeOptions = (options = {}) ->
   {only, except} = options
-  options.only = util.toArray only
-  options.except = util.toArray except
+  options.only = util.toArray(only).map (str) -> str.toLowerCase()
+  options.except = util.toArray(except).map (str) -> str.toLowerCase()
   options.parallel or= false
   return options
 
@@ -37,6 +37,7 @@ class Controller
     return @_actions
 
   call: (actionName, req, res, callback) ->
+    actionName = actionName.toLowerCase()
     unless @_wrappedActions[actionName]
       @_wrappedActions[actionName] = @_wrapAction actionName
     actions = @_actions
