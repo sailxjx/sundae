@@ -1,6 +1,8 @@
+path = require 'path'
 should = require 'should'
 supertest = require 'supertest'
 express = require 'express'
+jade = require 'jade'
 sundae = require '../src/sundae'
 
 describe 'Sundae#Router', ->
@@ -132,3 +134,23 @@ describe 'Sundae#Router', ->
       res.statusCode.should.eql 500
       res.body.message.should.eql 'Unknown error'
       done()
+
+  it 'worker with view engine', (done) ->
+
+    app = sundae express()
+
+    app.engine 'jade', jade.__express
+    app.set 'views', path.join __dirname, 'views'
+    app.set 'view engine', 'jade'
+
+    app.controller 'home', ->
+
+      @action 'index', (req, res, callback) ->
+        res.render 'home', title: 'home'
+
+    app.get '/', to: 'home#index'
+
+    supertest(app).get('/').end (err, res) ->
+      res.statusCode.should.eql 200
+      res.text.should.eql '<h1>home</h1>'
+      done err

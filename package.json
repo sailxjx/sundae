@@ -28,6 +28,7 @@
   "devDependencies": {
     "coffee-script": "^1.9.3",
     "express": "^4.12.4",
+    "jade": "^1.10.0",
     "mocha": "^2.2.5",
     "should": "^6.0.3",
     "supertest": "^1.0.1"
