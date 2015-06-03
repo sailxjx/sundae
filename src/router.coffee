@@ -112,6 +112,7 @@ module.exports = (app) ->
 
     app[method] = (path) ->
 
+      # Keep the polymorphism feature of `app.get` or other native express routes
       return _fn.apply this, arguments if arguments.length is 1
 
       callback = app.routeCallback or (req, res) ->
