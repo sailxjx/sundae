@@ -1,54 +1,47 @@
 should = require 'should'
 express = require 'express'
-async = require 'async'
 supertest = require 'supertest'
+sundae = require '../src/sundae'
 
-request = require '../src/request'
+describe 'Sundae#Request', ->
 
-describe 'Request', ->
+  app = sundae express()
 
-  app = express()
+  req = app.request
+  req.importKeys = ['_id']
+  req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
+  req.alias = address: 'location'
+  req.validators = fullname: (fullname) -> fullname.length < 10
+  req.setters = email: (email) -> @email = email
 
-  before ->
-    request app, (req) ->
-      req.importKeys = ['_id']
-      req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
-      req.alias = address: 'location'
-      req.validators = fullname: (fullname) -> fullname.length < 10
-      req.setters = email: (email) -> @email = email
+  it 'should apply the alias/validators/setters when call set method', ->
+    # Test importKeys
+    req.set '_id', 1
+    req._id.should.eql 1
 
-  it 'should apply the alias/validators/setters when call set method', (done) ->
-    # Test setters
-    app.use (req, res) ->
-      # Test importKeys
-      req.set '_id', 1
-      req._id.should.eql 1
+    # Test allowdKeys
+    req.set 'name', 'Grace'
+    req.set 'nickname', 'GG', true
+    req.get().should.have.properties 'name'
+    req.get().should.not.have.properties 'nickname'
 
-      # Test allowdKeys
-      req.set 'name', 'Grace'
-      req.set 'nickname', 'GG', true
-      req.get().should.have.properties 'name'
-      req.get().should.not.have.properties 'nickname'
+    # Test alias
+    req.set 'address', 'Shanghai'
+    req.get('location').should.eql 'Shanghai'
 
-      # Test alias
-      req.set 'address', 'Shanghai'
-      req.get('location').should.eql 'Shanghai'
-
-      # Test validators
-      err = req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
+    # Test validators
+    try
+      req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
+    catch err
       err.message.should.eql 'Param fullname is invalid'
-      req.get().should.not.have.properties 'fullname'
 
-      # Test setters
-      req.set 'email', 'grace@gmail.com'
-      req.email.should.eql 'grace@gmail.com'
+    req.get().should.not.have.properties 'fullname'
 
-      # Test remove
-      req.remove '_id'
-      should(req._id).eql undefined
-      should(req.get('_id')).eql undefined
+    # Test setters
+    req.set 'email', 'grace@gmail.com'
+    req.email.should.eql 'grace@gmail.com'
 
-      res.end 'ok'
-      done()
-
-    supertest(app).get('/').end(->)
+    # Test remove
+    req.remove '_id'
+    should(req._id).eql undefined
+    should(req.get('_id')).eql undefined

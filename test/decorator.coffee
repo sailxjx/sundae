@@ -1,87 +1,109 @@
 should = require 'should'
 express = require 'express'
-supertest = require 'supertest'
-
-ensure = require '../src/decorators/ensure'
-beforeAction = require '../src/decorators/before'
-select = require '../src/decorators/select'
-afterAction = require '../src/decorators/after'
-request = require '../src/request'
+sundae = require '../src/sundae'
 
 describe 'Decorators#Ensure', ->
 
-  app = express()
-  request app, (req) -> req.allowedKeys = ['name', 'lang']
+  app = sundae express()
 
-  it 'should callback error when params not meet ensures', (done) ->
-    app.use (req, res) ->
-      req.set 'name', 'hi'
-      ensure('_sessionUserId') req, res, (err) -> should(err).not.eql null
-      res.end 'ok'
+  req = app.request
 
-    supertest(app).get('/').end done
+  req.set 'name', 'hi'
 
-  it 'should not callback error when meet all params', (done) ->
-    app.use (req, res) ->
-      req.set 'name', 'hi'
-      req.set 'lang', 'en'
-      ensure('name') req, res, (err) -> should(err).eql null
-      res.end 'ok'
+  req.set 'lang', 'en'
 
-    supertest(app).get('/').end done
+  custom = app.controller 'custom', ->
+
+    @ensure '_userId', only: 'fail'
+
+    @ensure 'name lang', only: 'success'
+
+    @action 'fail', (req, res, callback) -> callback null, 'fail'
+
+    @action 'succ', (req, res, callback) -> callback null, 'succ'
+
+  it 'should callback error when params not meet ensures', ->
+
+    custom.call 'fail', req, {}, (err) -> err.message.should.eql 'Params _userId missing'
+
+  it 'should not callback error when meet all params', ->
+
+    custom.call 'succ', req, {}, (err, result) -> result.should.eql 'succ'
 
 describe 'Decorators#Before', ->
 
-  app = express()
-  request app, (req) -> req.allowedKeys = ['name']
+  app = sundae express()
 
-  it 'should callback error when use ensureMember before hook', (done) ->
-    app.use (req, res) ->
-      req.set 'name', 'Grace'
-      req.ctrlObj =
-        upper: (req, res, next) ->
-          req.set('name', req.get('name').toUpperCase())
-          next()
-      beforeAction('upper') req, res, (err) ->
-        req.get('name').should.eql 'GRACE'
-      res.end 'ok'
+  req = app.request
 
-    supertest(app).get('/').end done
+  req.set 'name', 'xiaolaba'
+
+  custom = app.controller 'custom', ->
+
+    @before 'toUpperCase'
+
+    @action 'toUpperCase', (req, res, callback) -> callback null, req.set('name', req.get('name').toUpperCase())
+
+    @action 'read', (req, res, callback) -> callback null, req.get('name')
+
+  it 'should callback error when use ensureMember before hook', ->
+
+    custom.call 'read', req, {}, (err, result) -> result.should.eql 'XIAOLABA'
 
 describe 'Decorators#After', ->
 
-  app = express()
+  app = sundae express()
 
-  it 'should call the after function and get a new property', (done) ->
-    app.use (req, res) ->
-      req.ctrlObj =
-        isNew: (req, res, result, callback) ->
-          result.isNew = true
-          callback(null, result)
-      afterAction('isNew') req, res, {}, (err, result) ->
-        result.should.have.properties 'isNew'
-      res.end 'ok'
-    supertest(app).get('/').end done
+  req = app.request
+
+  req.set 'name', 'xiaolaba'
+
+  custom = app.controller 'custom', ->
+
+    @after 'toUpperCase'
+
+    @action 'toUpperCase', (req, res, name, callback) -> callback null, name.toUpperCase()
+
+    @action 'read', (req, res, callback) -> callback null, req.get('name')
+
+  it 'should call the after function and get a new property', ->
+
+    custom.call 'read', req, {}, (err, result) -> result.should.eql 'XIAOLABA'
 
 describe 'Decorators#Select', ->
 
+  app = sundae express()
+
+  custom = app.controller 'custom', ->
+
+    @select 'id other', only: 'pick array'
+
+    @select '-password', only: 'omit'
+
+    @action 'pick', (req, res, callback) -> callback null, id: 1, name: 'xiaolaba'
+
+    @action 'omit', (req, res, callback) -> callback null, id: 1, password: '123'
+
+    @action 'array', (req, res, callback) -> callback null, [
+      id: 1
+      name: 'xiaolaba'
+    ,
+      id: 2
+      name: 'dalaba'
+    ]
+
   it 'should pick fields and ignore others', ->
-    result =
-      id: '123'
-      name: 'Grace'
-      updatedAt: '2014-02-24T03:50:00.841Z'
-    select('id updatedAt other') {}, {}, result, (err, result) ->
-      result.should.have.keys 'id', 'updatedAt'
+
+    custom.call 'pick', {}, {}, (err, result) -> result.should.eql id: 1
 
   it 'should omit fields', ->
-    result =
-      name: 'Grace'
-      password: '123456'
-      updatedAt: '2014-02-24T03:50:00.841Z'
-    select('-password') {}, {}, result, (err, result) ->
-      result.should.have.keys 'name', 'updatedAt'
+
+    custom.call 'omit', {}, {}, (err, result) -> result.should.eql id: 1
 
   it 'should get the correct fields when the result is an array', ->
-    result = ['a', 'b', 'c']
-    select('-any') {}, {}, result, (err, result) ->
-      result.should.eql ['a', 'b', 'c']
+
+    custom.call 'array', {}, {}, (err, result) -> result.should.eql [
+      id: 1
+    ,
+      id: 2
+    ]

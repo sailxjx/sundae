@@ -1,18 +1,19 @@
-loaders =
-  router: require './router'
-  request: require './request'
-  response: require './response'
+router = require './router'
+request = require './request'
+controller = require './controller'
+decorator = require './decorator'
 
-Sundae = (app) ->
-  throw new Error('App missing') unless app
-  app.sundae = sundae = {}
-  sundae.load = (loaderName, configFn) ->
-    loader = loaders[loaderName]
-    throw new Error("Module #{loaderName} was not found") unless loader
-    sundae[loaderName] = loader app, configFn
-    sundae
-  sundae
+sundae = (app) ->
+  router app
+  request app
+  controller app
+  decorator app
+  # Load build-in decorators
+  app.decorator 'mixin', require './decorators/mixin'
+  app.decorator 'ensure', require './decorators/ensure'
+  app.decorator 'before', require './decorators/before'
+  app.decorator 'after', require './decorators/after'
+  app.decorator 'select', require './decorators/select'
+  app
 
-Sundae.BaseController = require './controller'
-
-module.exports = Sundae
+module.exports = sundae

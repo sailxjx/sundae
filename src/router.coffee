@@ -1,163 +1,143 @@
+# Router component
+# Modify the routers of express application
+
+pathLib = require 'path'
+
+try
+  methods = require 'express/node_modules/methods'
+catch e
+  console.warn "Express is not installed"
+  methods = [ 'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol', 'move', 'purge', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout', 'merge', 'm-search', 'notify', 'subscribe', 'unsubscribe', 'patch', 'search', 'connect' ]
+
 _ = require 'lodash'
-async = require 'async'
+
 inflection = require 'inflection'
-p = require 'path'
-backbone = require './backbone'
-incubator = require './incubator'
+util = require './util'
 
-class Router
+_parseOptions = (options) ->
+  {to, only, except} = options
+  [options.ctrl, options.action] = to.split('#') if to?
+  options.only = util.toArray only
+  options.except = util.toArray except
 
-  constructor: (@app) ->
-    @_stack = []
+  options
 
-  middlewares: []
+_resourceRouter = (ctrl, options = {}) ->
+  app = this
+  uriPrefix = inflection.pluralize(ctrl)
 
-  prefix: null
+  resourceMap =
+    readOne: method: 'get', path: "/#{uriPrefix}/:_id"
+    read: method: 'get', path: "/#{uriPrefix}"
+    create: method: 'post', path: "/#{uriPrefix}"
+    update: method: 'put', path: "/#{uriPrefix}/:_id"
+    remove: method: 'delete', path: "/#{uriPrefix}/:_id"
 
-  ctrlDir: process.cwd() + '/controllers'
+  {only, except} = _parseOptions options
+  if only
+    resourceMap = _.pick resourceMap, only
+  else if except
+    resourceMap = _.omit resourceMap, except
 
-  # Route map of restful requests
-  _resource: (ctrl) ->
-    ctrl = inflection.pluralize(ctrl)
-    readOne: # Read One By Ids
-      method: 'get'
-      path: "/#{ctrl}/:_id"
-    read:
-      method: 'get'
-      path: "/#{ctrl}"
-    create:
-      method: 'post'
-      path: "/#{ctrl}"
-    update:
-      method: 'put'
-      path: "/#{ctrl}/:_id"
-    remove:
-      method: 'delete'
-      path: "/#{ctrl}/:_id"
-
-  # Dsl to generate options for get/post/put/delete
-  _parseDsl = (path, options = {}) ->
-    if arguments.length is 2
-      options.path = path
-      {to} = options
-
-      if to?  # Parse option to
-        [ctrl, action] = to.split('#')
-        action or= 'index'
-        options.ctrl or= ctrl
-        options.action or= action
-
-    else
-      options = path
-    return options
-
-  callback: (req, res) -> res.response()
-
-  resource: (ctrl, options = {}) ->
-    map = @_resource(ctrl)
-
-    {only, except} = options
-    if only?
-      map = _.pick(map, only)
-    else if except?
-      map = _.omit(map, except)
-
-    for action, opt of map
-      _options = _.extend
-        ctrl: ctrl
-        action: action
-        method: opt.method
-        path: opt.path
-      , options
-      @_apply _options
-
-  get: ->
-    options = _parseDsl.apply(this, arguments)
-    options.method = 'get'
-    @_apply(options)
-
-  post: ->
-    options = _parseDsl.apply(this, arguments)
-    options.method = 'post'
-    @_apply(options)
-
-  put: ->
-    options = _parseDsl.apply(this, arguments)
-    options.method = 'put'
-    @_apply(options)
-
-  delete: ->
-    options = _parseDsl.apply(this, arguments)
-    options.method = 'delete'
-    @_apply(options)
-
-  options: ->
-    options = _parseDsl.apply(this, arguments)
-    options.method = 'options'
-    @_apply(options)
-
-  _apply: (options = {}) ->
-    {ctrl, action, method, path, middlewares, callback} = options
-    middlewares or= @middlewares
-    callback or= @callback
-    action or= 'index'
-
-    ctrlObj = require p.join(@ctrlDir, ctrl)
-    return false unless typeof ctrlObj[action] is 'function'
-
-    # Bind hooks
-    incubator ctrlObj, action
-
-    if toString.call(path) is '[object String]' and @prefix
-      path = p.join @prefix, path
-
-    # Register apis
-    @_stack.push
-      path: path
-      method: method
-      ctrlObj: ctrlObj
+  Object.keys(resourceMap).forEach (action) ->
+    {method, path} = resourceMap[action]
+    _options = _.assign
       ctrl: ctrl
       action: action
+    , options
+    app[method].call app, path, _options
 
-    @app[method] path, (req, res, next) ->
-      # Mix all params to one variable
-      _params = _.extend(
-        _.clone(req.headers or {})
-        _.clone(req.cookies or {})
-        _.clone(req.params or {})
-        _.clone(req.query or {})
-        _.clone(req.body or {})
-        _.clone(req.session or {})
+_parseArguments = (method) ->
+
+  return (args...) ->
+
+    app = this
+    _middlewares = []
+    [path, options] = args
+
+    return args if args.length is 1
+
+    if args.length is 2 and toString.call(options) is '[object Object]'
+      {ctrl, action, middlewares} = _parseOptions options
+      action or= 'index'
+      actionName = action
+      ctrlName = ctrl
+      _middlewares = [].concat middlewares or @middlewares or []
+
+      controller = app.controller ctrlName
+      # Check whether the action exists
+      actionFunc = controller.action actionName
+
+      _middlewares.push controller.call.bind controller, actionName
+
+      app.routeStack.push
+        ctrl: ctrlName
+        action: actionName
+        path: path
+        method: method
+
+    else [path, _middlewares...] = args
+
+    # Inject first router middleware to construct request params
+    _prepare = (req, res, next) ->
+      _params = _.assign(
+        {}
+        req.headers or {}
+        req.cookies or {}
+        req.params or {}
+        req.query or {}
+        req.body or {}
+        req.session or {}
       )
-      req._params = {}
-      for k, v of _params
-        # response error message if the param is invalid
-        if (err = req.set(k, v, true)) instanceof Error
-          res.err = err
-          return callback(req, res)
-      req.ctrlObj = ctrlObj
+
+      for key, val of _params
+        req.set key, val, true
+
       req.ctrl = ctrl
       req.action = action
-      req.middlewares = middlewares
-      backbone req, res, callback
+      next()
 
-  http404: (req, res, next) ->
-    err = new Error 'Not found'
-    err.phrase = 'NOT_FOUND'
-    err.status = 404
-    res.err = err
-    res.response err
+    _middlewares.unshift _prepare
 
-  http500: (err, req, res, next) ->
-    err.status or= 500
-    err.message or= 'Unknown error'
-    err.phrase or= 'UNKNOWN_ERROR'
-    res.err = err
-    res.response err
+    # [path, _prepare, middleware1, middleware2, action]
+    [path].concat _middlewares
 
-router = (app, fn = ->) ->
-  _router = new Router app
-  fn.call app, _router
-  _router
+module.exports = (app) ->
 
-module.exports = router
+  app.routeStack = []
+
+  methods.forEach (method) ->
+
+    _fn = app[method]
+
+    app[method] = (path) ->
+
+      # Keep the polymorphism feature of `app.get` or other native express routes
+      return _fn.apply this, arguments if arguments.length is 1
+
+      callback = app.routeCallback or (req, res) ->
+        if res.err
+          res.status(500).json
+            code: @err.code
+            message: @err.message
+        else if res.result
+          res.status(200).json res.result
+
+      # Add global prefix on each route
+      if toString.call(path) is '[object String]' and app.routePrefix
+        arguments[0] = pathLib.join app.routePrefix, path
+
+      args = _parseArguments(method).apply this, arguments
+
+      actionFunc = args[args.length - 1]
+
+      return _fn.apply this, args unless toString.call(actionFunc) is '[object Function]'
+
+      args[args.length - 1] = (req, res) ->
+        actionFunc req, res, (err, result) ->
+          res.err = err
+          res.result = result
+          callback req, res
+      return _fn.apply this, args
+
+  app.resource = _resourceRouter

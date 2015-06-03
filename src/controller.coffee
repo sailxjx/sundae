@@ -1,65 +1,125 @@
-# Javascript do not support multiple inheritance, so just feel free to use mixins
 _ = require 'lodash'
 util = require './util'
+{slice} = Array.prototype
 
-ensure = require './decorators/ensure'
-beforeAction = require './decorators/before'
-afterAction = require './decorators/after'
-select = require './decorators/select'
+# Generate an id for each hook or action
+_funcId = 0
 
-ignores = ['__super__', 'constructor']
-
-_mix = (base, target) ->
-  for key, prop of target
-    if hasOwnProperty.call(target, key) and key not in ignores
-      base[key] = prop
-  return base
-
-_mixin = (child, parent) ->
-  if toString.call(parent) is '[object Array]'
-    parent.forEach (obj) -> _mixin child, obj
-  else
-    _mix(child, parent)
-    _mix(child.prototype, parent.prototype)
-  return child
-
-_normalizeOptions = (options) ->
+_normalizeOptions = (options = {}) ->
   {only, except} = options
-  options.only = util._toArray only
-  options.except = util._toArray except
+  options.only = util.toArray only
+  options.except = util.toArray except
   options.parallel or= false
   return options
 
-_registerHooks = (fn, props = []) ->
-  props = Array.prototype.slice.call(props, 0) if toString.call(props) is '[object Arguments]'
+class Controller
 
-  @_hooks = if @_hooks then _.clone(@_hooks) else []
+  constructor: (@name) ->
+    @_actions = {}
+    @_preHooks = []
+    @_postHooks = []
+    @_wrappedActions = {}
 
-  options = if toString.call(props[props.length - 1]) is '[object Object]' then props.pop() else {}
+  action: (actionName, actionFunc) ->
+    if @_actions[actionName] and actionFunc
+      throw new Error("Can not redefine action #{actionName}")
 
-  # Bind options to the function
-  _fn = fn.apply(this, props)
-  _fn = _.extend _fn, _normalizeOptions(options)
-  # Hook with four arguments will be treated as a afterAction function
-  # Else it will be treated as a beforeAction function
-  if _fn.length is 4 then @_hooks.push _fn else @_hooks.unshift _fn
-  return true
+    unless @_actions[actionName]
+      if toString.call(actionFunc) is '[object Function]'
+        actionFunc.funcId or= _funcId += 1
+      @_actions[actionName] = actionFunc
+    @_actions[actionName]
 
-class BaseController
+  actions: (actions = {}) ->
+    for actionName, actionFunc of actions
+      @action actionName, actionFunc
+    return @_actions
 
-  # Mixin methods from other modules
-  @mixin: (args...) -> _mixin this, args
+  call: (actionName, req, res, callback) ->
+    unless @_wrappedActions[actionName]
+      @_wrappedActions[actionName] = @_wrapAction actionName
+    actions = @_actions
+    @_wrappedActions[actionName].apply actions, slice.call arguments, 1
 
-  # Ensure declared params
-  @ensure: -> _registerHooks.call this, ensure, arguments
+  preHook: (options) ->
+    options.hookFunc.funcId or= _funcId += 1
+    _options = _.assign {}, options
+    @_preHooks.unshift _normalizeOptions _options
 
-  # Function hook before action
-  @before: -> _registerHooks.call this, beforeAction, arguments
+  postHook: (options) ->
+    options.hookFunc.funcId or= _funcId += 1
+    _options = _.assign {}, options
+    @_postHooks.push _normalizeOptions _options
 
-  # Function hook after action
-  @after: -> _registerHooks.call this, afterAction, arguments
+  ###*
+   * Wrap action with hooks
+   * @param  {String} actionName - Name of action
+   * @return {Function} actionFunc - Handler of action
+  ###
+  _wrapAction: (actionName) ->
+    actionFunc = @action actionName
+    unless toString.call(actionFunc) is '[object Function]'
+      throw new Error "Action #{actionName} is not exist"
+    return actionFunc unless @_preHooks.length or @_postHooks.length
 
-  # Select properties before response
-  @select: -> _registerHooks.call this, select, arguments
+    actions = @_actions
 
-module.exports = BaseController
+    _calledFuncIds = []
+
+    _preCheck = (actionFunc, options) ->
+      {hookFunc, only, except, parallel, hookName} = options
+      return actionFunc if except.length > 0 and actionName in except
+      return actionFunc if only.length > 0 and actionName not in only
+      return actionFunc if hookFunc.funcId in _calledFuncIds
+      return actionFunc if hookName is actionName
+
+    actionFunc = @_preHooks.reduce (actionFunc, options) ->
+      {hookFunc, only, except, parallel} = options
+      _actionFunc = _preCheck actionFunc, options
+      return _actionFunc if toString.call(_actionFunc) is '[object Function]'
+
+      _actionFunc = (req, res, callback) ->
+        if parallel
+          hookFunc.call actions, req, res
+          actionFunc.call actions, req, res, callback
+        else
+          hookFunc.call actions, req, res, (err) ->
+            return callback(err) if err
+            actionFunc.call actions, req, res, callback
+
+      _calledFuncIds.push hookFunc.funcId
+
+      _actionFunc
+
+    , actionFunc
+
+    _calledFuncIds.push actionFunc.funcId
+
+    actionFunc = @_postHooks.reduce (actionFunc, options) ->
+      {funcId, hookFunc, only, except, parallel} = options
+      _actionFunc = _preCheck actionFunc, options
+      return _actionFunc if toString.call(_actionFunc) is '[object Function]'
+
+      _actionFunc = (req, res, callback) ->
+        actionFunc.call actions, req, res, (err, result) ->
+          return callback(err) if err
+          if parallel
+            callback err, result
+            hookFunc.call actions, req, res, result
+          else
+            hookFunc.call actions, req, res, result, callback
+
+      _calledFuncIds.push hookFunc.funcId
+
+      _actionFunc
+
+    , actionFunc
+
+module.exports = controller = (app) ->
+  _controllers = {}
+  app.controller = (ctrlName, ctrlFunc) ->
+    unless _controllers[ctrlName]
+      _controllers[ctrlName] = new Controller ctrlName
+    _.assign _controllers[ctrlName], app._decorators
+    ctrlFunc?.apply _controllers[ctrlName], _controllers[ctrlName]
+    _controllers[ctrlName]

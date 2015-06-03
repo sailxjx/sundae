@@ -11,71 +11,40 @@ Rtf restful framework for node
 
 Sundae is a light weight api framework based on express, but more intesting than express.
 
-# Application structure
-```
-- app
-  - config          Application configs.
-                    Include 'request', 'response', 'express', 'routes', etc.
-  - controllers     Application controllers
-    - mixins        Codes you want to share between controllers.
-                    it's something like 'lib' directory,
-                    but the purpose is more clear than 'libraries'.
-                    Someone (like me) may confused with how to share codes between controllers,
-                    usually you can put these codes in `ApplicationController` or other base controllers.
-                    But for most of time, `include` is better than `extend`,
-                    so I'd like to put these codes in a different path, and `mix` them in.
-                    you can mix them in by using the `@mixin` function in the declaration of controller
-  - helpers         Just helpers
-  - mailers         Codes deal with mails
-  - util            Utility static methods
-```
-
-# Cli usage
-```
-  Usage: sundae [options] [command]
-
-  Commands:
-
-    init
-       prepare for the application folder
-
-
-  Options:
-
-    -h, --help  output usage information
-```
 # A quick brief of router
 
-You can find this file in `app/config/routes`
-
 ```coffeescript
-module.exports = (router) ->
+app = sundae express()
 
-  # You can definitely declare the path to route
-  # Router support get/post/put/delete/options methods
-  # The route pattarn is something like `router.{method} path, to: {controller}#{action}`
-  router.get '/', to: 'home#index'
+# You can definitely declare the path to route
+# Router support all methods exported from `methods` module (get/post/put/delete/options/etc...)
+# The route pattarn is something like `app[method] path, to: {controller}#{action}`
+app.get '/', to: 'home#index'
 
-  # # Post method
-  # router.post '/', to: 'home#create'
+# Post method
+app.post '/', to: 'home#create'
 
-  # # Put method
-  # router.put '/:_id', to: 'home#update'
+# Resource route
+# Then you also got the `resource` function to do the above things more restfully
+app.resource 'home', only: ['create', 'read']
 
-  # # Delete method
-  # router.delete '/:_id', to: 'home#delete'
-
-  # # Resource
-  # # Then you also got the `resource` function to do the above things more restfully
-  # router.resource 'home'
+# Router options
+# Router support some options like
+# `only`: Only use actions listed in the only option
+# `except`: Omit the actions in except option
+# `to`: Alias to `ctrl#action`
+# `ctrl`: Controller name
+# `action`: Action name
+# The example below shows mapping a group of `user` restful apis to the admin controller
+app.resource 'user', ctrl: 'admin'
 ```
 
 # A quick brief of controller
 
-You can try this controller in the `app/controllers` directory.
-
 ```coffeescript
-class HomeController extends sundae.BaseController
+app = sundae express()
+
+app.controller 'home', ->
 
   # Mixin permission functions
   @mixin require './mixins/permission'
@@ -94,7 +63,7 @@ class HomeController extends sundae.BaseController
 
   # This is a controller action
   # You can call this function through router
-  index: (req, res, callback) ->
+  @action 'index', (req, res, callback) ->
     callback null,
       welcome: 'Hello World'
       "user-agent": req.get('user-agent')
@@ -103,14 +72,12 @@ class HomeController extends sundae.BaseController
   # This is a filter function looks like controller actions
   # You can call this function from router
   # But most time you shouldn't do this
-  checkAgent: (req, res, callback) ->
+  @action 'checkAgent', (req, res, callback) ->
     userAgent = req.get('user-agent')
     # If the first param of callback is not null
     # controller.index will not be called
     return callback(new Error('GOD! WHY ARE YOU STILL USING IE?')) if userAgent.match /MSIE/
     callback()
-
-module.exports = new HomeController
 ```
 
 # Router options
@@ -123,14 +90,16 @@ module.exports = new HomeController
 - `only` only the specific actions will apply hooks
 - `except` all actions will apply hooks without the except actions
 - `parallel` hooks will be parallel executed, the default mode is series (execute one by one)
-- `transfer` transfer the result into expected format before apply hooks
 
 # TODO
 
-- `transfer` option to call before middlewares
-- `skip` option for skipping hooks
+- add `validator` decorator, `@validator 'name', (name) -> name.length < 10`
 
 # Changelog
+
+## 0.5.0
+- Apply `sundae` on the application level.
+- New router, controller, action patterns.
 
 ## 0.4.0
 - remove `express` in dependencies, you should require express by yourself in application
