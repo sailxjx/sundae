@@ -37,7 +37,7 @@ module.exports = (app) ->
     key = aliasKey if aliasKey?
 
     if typeof @setters[key] is 'function'
-      return @setters[key].call(this, val)
+      return @_params[key] = @setters[key].call this, val
 
     return this if onlyAllowed and key not in @allowedKeys
 

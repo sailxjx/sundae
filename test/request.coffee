@@ -12,7 +12,7 @@ describe 'Sundae#Request', ->
   req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
   req.alias = address: 'location'
   req.validators = fullname: (fullname) -> fullname.length < 10
-  req.setters = email: (email) -> @email = email
+  req.setters = email: (email) -> "user" + email
 
   it 'should apply the alias/validators/setters when call set method', ->
     # Test importKeys
@@ -39,7 +39,7 @@ describe 'Sundae#Request', ->
 
     # Test setters
     req.set 'email', 'grace@gmail.com'
-    req.email.should.eql 'grace@gmail.com'
+    req.get('email').should.eql 'usergrace@gmail.com'
 
     # Test remove
     req.remove '_id'
