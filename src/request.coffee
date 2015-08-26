@@ -42,9 +42,14 @@ module.exports = (app) ->
     return this if onlyAllowed and key not in @allowedKeys
 
     # Validators will filter the value and check for the returned value
-    _validator = @validators[key] or @validators['_general']
-    if _validator? and not _validator(val, key)
-      throw new Error("Param #{key} is invalid")
+    try
+      _validator = @validators[key] or @validators['_general']
+      if _validator? and not _validator(val, key)
+        throw new Error("Param #{key} is invalid")
+    catch err
+      err.phrase = 'PARAMS_INVALID'
+      err.params = [key]
+      throw err
 
     @_params[key] = val
     @[key] = val if key in @importKeys

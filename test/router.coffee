@@ -135,7 +135,7 @@ describe 'Sundae#Router', ->
       res.body.message.should.eql 'Unknown error'
       done()
 
-  it 'worker with view engine', (done) ->
+  it 'work with view engine', (done) ->
 
     app = sundae express()
 
