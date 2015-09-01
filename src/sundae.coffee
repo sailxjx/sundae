@@ -14,6 +14,10 @@ sundae = (app) ->
   app.decorator 'before', require './decorators/before'
   app.decorator 'after', require './decorators/after'
   app.decorator 'select', require './decorators/select'
+  app.decorator 'ratelimit', require './decorators/ratelimit'
   app
+
+# Lazy load decorators
+sundae.decorator = (name) -> require "./decorators/#{name}"
 
 module.exports = sundae

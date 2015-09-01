@@ -107,3 +107,24 @@ describe 'Decorators#Select', ->
     ,
       id: 2
     ]
+
+describe 'Decorators#Ratelimit', ->
+
+  app = sundae express()
+
+  custom = app.controller 'custom', ->
+
+    @ratelimit 1
+
+    @action 'get', (req, res, callback) -> callback null, ok: 1
+
+    @action 'other', (req, res, callback) -> callback null, ok: 1
+
+  req = ip: '127.0.0.1'
+
+  custom.call 'get', req, {}, (err, result) -> result.ok.should.eql 1
+
+  custom.call 'get', req, {}, (err, result) -> err.phrase.should.eql 'RATE_LIMIT_EXCEEDED'
+
+  # Will not hurt other actions
+  custom.call 'other', req, {}, (err, result) -> result.ok.should.eql 1
