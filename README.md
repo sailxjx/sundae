@@ -93,8 +93,6 @@ app.controller 'home', ->
 
 # TODO
 
-- add `validator` decorator, `@validator 'name', (name) -> name.length < 10`
-
 # Changelog
 
 ## 0.5.0
