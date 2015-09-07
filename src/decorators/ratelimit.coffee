@@ -24,7 +24,6 @@ module.exports = ratelimit = (limit, options = {}) ->
     rateMap[timeKey] or= {}
     rateMap[timeKey][rateKey] or= 0
     rateMap[timeKey][rateKey] += 1
-    console.log rateMap
     if rateMap[timeKey][rateKey] > limit
       err = new Error('Rate limit exceeded')
       err.phrase = 'RATE_LIMIT_EXCEEDED'

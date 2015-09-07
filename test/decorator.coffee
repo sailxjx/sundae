@@ -121,10 +121,13 @@ describe 'Decorators#Ratelimit', ->
     @action 'other', (req, res, callback) -> callback null, ok: 1
 
   req = ip: '127.0.0.1'
-
+  req.ctrl = 'custom'
+  req.action = 'get'
   custom.call 'get', req, {}, (err, result) -> result.ok.should.eql 1
 
   custom.call 'get', req, {}, (err, result) -> err.phrase.should.eql 'RATE_LIMIT_EXCEEDED'
 
   # Will not hurt other actions
+  req.ctrl = 'custom'
+  req.action = 'other'
   custom.call 'other', req, {}, (err, result) -> result.ok.should.eql 1

@@ -37,8 +37,6 @@ class Controller
 
   call: (actionName, req, res, callback) ->
     unless @_wrappedActions[actionName]
-      req.ctrl = @name
-      req.action = actionName
       @_wrappedActions[actionName] = @_wrapAction actionName
     actions = @_actions
     @_wrappedActions[actionName].apply actions, slice.call arguments, 1
