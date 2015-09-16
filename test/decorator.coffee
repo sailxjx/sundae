@@ -1,6 +1,7 @@
 should = require 'should'
 express = require 'express'
 sundae = require '../src/sundae'
+ratelimit = require '../src/decorators/ratelimit'
 
 describe 'Decorators#Ensure', ->
 
@@ -110,24 +111,31 @@ describe 'Decorators#Select', ->
 
 describe 'Decorators#Ratelimit', ->
 
-  app = sundae express()
+  it 'should check for the limit formats', ->
+    ratelimit.parseLimit(1).should.eql 60: 1
+    ratelimit.parseLimit('10 20 30').should.eql 60: 10, 600: 20, 3600: 30
+    ratelimit.parseLimit('10,20 20').should.eql 20: 10, 600: 20
 
-  custom = app.controller 'custom', ->
+  it 'should throw out an error when rate limit exceeded', ->
 
-    @ratelimit 1
+    app = sundae express()
 
-    @action 'get', (req, res, callback) -> callback null, ok: 1
+    custom = app.controller 'custom', ->
 
-    @action 'other', (req, res, callback) -> callback null, ok: 1
+      @ratelimit 1
 
-  req = ip: '127.0.0.1'
-  req.ctrl = 'custom'
-  req.action = 'get'
-  custom.call 'get', req, {}, (err, result) -> result.ok.should.eql 1
+      @action 'get', (req, res, callback) -> callback null, ok: 1
 
-  custom.call 'get', req, {}, (err, result) -> err.phrase.should.eql 'RATE_LIMIT_EXCEEDED'
+      @action 'other', (req, res, callback) -> callback null, ok: 1
 
-  # Will not hurt other actions
-  req.ctrl = 'custom'
-  req.action = 'other'
-  custom.call 'other', req, {}, (err, result) -> result.ok.should.eql 1
+    req = ip: '127.0.0.1'
+    req.ctrl = 'custom'
+    req.action = 'get'
+    custom.call 'get', req, {}, (err, result) -> result.ok.should.eql 1
+
+    custom.call 'get', req, {}, (err, result) -> err.phrase.should.eql 'RATE_LIMIT_EXCEEDED'
+
+    # Will not hurt other actions
+    req.ctrl = 'custom'
+    req.action = 'other'
+    custom.call 'other', req, {}, (err, result) -> result.ok.should.eql 1
