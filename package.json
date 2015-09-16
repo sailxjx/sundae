@@ -1,6 +1,6 @@
 {
   "name": "sundae",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "Rtf restful framework for node",
   "main": "lib/sundae.js",
   "scripts": {
