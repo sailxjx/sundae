@@ -16,21 +16,25 @@ module.exports = ratelimit = (limitStr, options = {}) ->
       now = Date.now()
       for timeKey, val of rateMap
         [rate, startTime] = timeKey.split '_'
-        if ((now / rate) - Number(startTime)) > 1
+        if ((now / 1000 / rate) - Number(startTime)) > 1
           delete rateMap[timeKey]
     , 60000
 
   options.hookFunc = (req, res, callback) ->
     rateKey = crypto.createHash('md5').update("#{req.ctrl}.#{req.action}.#{req.ip}.#{req.headers?['user-agent']}").digest('base64')
+
+    isExceeded = false
     for rate, limit of limitation
       timeKey = "#{rate}_" + Math.floor(Date.now() / 1000 / rate)
       rateMap[timeKey] or= {}
       rateMap[timeKey][rateKey] or= 0
       rateMap[timeKey][rateKey] += 1
-      if rateMap[timeKey][rateKey] > limit
-        err = new Error('Rate limit exceeded')
-        err.phrase = 'RATE_LIMIT_EXCEEDED'
-        return callback err
+      isExceeded = true if rateMap[timeKey][rateKey] > limit
+
+    if isExceeded
+      err = new Error('Rate limit exceeded')
+      err.phrase = 'RATE_LIMIT_EXCEEDED'
+      return callback err
     callback()
 
   @preHook options
