@@ -17,7 +17,7 @@ describe 'Decorators#Ensure', ->
 
     @ensure '_userId', only: 'fail'
 
-    @ensure 'name lang', only: 'success'
+    @ensure 'name lang', only: 'succ'
 
     @action 'fail', (req, res, callback) -> callback null, 'fail'
 
@@ -28,6 +28,34 @@ describe 'Decorators#Ensure', ->
     custom.call 'fail', req, {}, (err) -> err.message.should.eql 'Params _userId missing'
 
   it 'should not callback error when meet all params', ->
+
+    custom.call 'succ', req, {}, (err, result) -> result.should.eql 'succ'
+
+describe 'Decorators#Least', ->
+
+  app = sundae express()
+
+  req = app.request
+
+  req.set 'name', 'hi'
+
+  req.set 'lang', 'en'
+
+  custom = app.controller 'custom', ->
+
+    @least 'other things', only: 'fail'
+
+    @least 'name', only: 'succ'
+
+    @action 'fail', (req, res, callback) -> callback null, 'fail'
+
+    @action 'succ', (req, res, callback) -> callback null, 'succ'
+
+  it 'should callback error when at least one params existing in the query', ->
+
+    custom.call 'fail', req, {}, (err) -> err.message.should.eql 'Params other, things missing'
+
+  it 'should callback succ when at least one params existing in the query', ->
 
     custom.call 'succ', req, {}, (err, result) -> result.should.eql 'succ'
 

@@ -95,6 +95,9 @@ app.controller 'home', ->
 
 # Changelog
 
+## 0.5.8
+- Add `least` decorator.
+
 ## 0.5.0
 - Apply `sundae` on the application level.
 - New router, controller, action patterns.
