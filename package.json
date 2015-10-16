@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "inflection": "^1.7.1",
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "methods": "^1.1.1"
   }
 }

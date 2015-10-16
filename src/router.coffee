@@ -2,12 +2,7 @@
 # Modify the routers of express application
 
 pathLib = require 'path'
-
-try
-  methods = require 'express/node_modules/methods'
-catch e
-  console.warn "Express is not installed"
-  methods = [ 'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol', 'move', 'purge', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout', 'merge', 'm-search', 'notify', 'subscribe', 'unsubscribe', 'patch', 'search', 'connect' ]
+methods = require 'methods'
 
 _ = require 'lodash'
 
