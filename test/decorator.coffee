@@ -167,3 +167,24 @@ describe 'Decorators#Ratelimit', ->
     req.ctrl = 'custom'
     req.action = 'other'
     custom.call 'other', req, {}, (err, result) -> result.ok.should.eql 1
+
+describe 'Decorators#Mask', ->
+
+  it 'should filter the masked fields', ->
+
+    app = sundae express()
+
+    custom = app.controller 'custom', ->
+
+      @mask 'a,b/d'
+
+      @action 'mask', (req, res, callback) -> callback null,
+        a: 'a'
+        b:
+          c: 'c'
+          d: 'd'
+        e: 'e'
+
+    req = ctrl: 'custom', action: 'mask'
+
+    custom.call 'mask', req, {}, (err, result) -> result.should.eql a: 'a', b: d: 'd'

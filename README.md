@@ -95,6 +95,9 @@ app.controller 'home', ->
 
 # Changelog
 
+## 0.5.10
+- Add `mask` decorator;
+
 ## 0.5.8
 - Add `least` decorator.
 

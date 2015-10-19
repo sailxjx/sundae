@@ -16,6 +16,7 @@ sundae = (app) ->
   app.decorator 'select', require './decorators/select'
   app.decorator 'ratelimit', require './decorators/ratelimit'
   app.decorator 'least', require './decorators/least'
+  app.decorator 'mask', require './decorators/mask'
   app
 
 # Lazy load decorators
