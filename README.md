@@ -95,6 +95,9 @@ app.controller 'home', ->
 
 # Changelog
 
+## 0.5.11
+- Support '*' in `only` options;
+
 ## 0.5.10
 - Add `mask` decorator;
 

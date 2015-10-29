@@ -41,6 +41,27 @@ describe 'Controller', ->
 
     custom.call 'readOne', {}, {}, (err) -> err.message.should.eql 'Should not pass'
 
+  it 'should apply the hook on each action when set only to *', ->
+
+    app = sundae express()
+
+    app.decorator 'guard', (options) ->
+      options.hookFunc = (req, res, callback) ->
+        callback new Error('Should not pass')
+      @preHook options
+
+    custom = app.controller 'custom', ->
+
+      @guard only: 'readOne *'
+
+      @action 'read', (req, res, callback) -> callback null, 'ok'
+
+      @action 'readOne', (req, res, callback) -> callback null, 'ok'
+
+    custom.call 'read', {}, {}, (err) -> err.message.should.eql 'Should not pass'
+
+    custom.call 'readOne', {}, {}, (err) -> err.message.should.eql 'Should not pass'
+
   it 'should not apply excepted hooks (in post hook)', ->
 
     app = sundae express()

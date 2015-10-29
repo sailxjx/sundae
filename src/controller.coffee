@@ -69,7 +69,7 @@ class Controller
     _preCheck = (actionFunc, options) ->
       {hookFunc, only, except, parallel, hookName} = options
       return actionFunc if except.length > 0 and actionName in except
-      return actionFunc if only.length > 0 and actionName not in only
+      return actionFunc if only.length > 0 and '*' not in only and actionName not in only
       return actionFunc if hookFunc.funcId in _calledFuncIds
       return actionFunc if hookName is actionName
 
