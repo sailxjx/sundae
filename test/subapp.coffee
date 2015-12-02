@@ -5,6 +5,25 @@ sundae = require '../src/sundae'
 
 describe 'Subapp', ->
 
+  it '
+  should construct new req/res objects when calling new on app.request/response
+  \n\t and should not share any temporary properties outside of __proto__
+  ', ->
+
+    app = sundae()
+
+    req1 = app.request()
+    req2 = app.request()
+
+    req1.__proto__.should.eql req2.__proto__
+    req1.set 'a', 'a'
+    req1.get('a').should.eql 'a'
+    should(req2.get('a')).be.empty
+
+    res1 = app.response()
+    res2 = app.response()
+    res1.__proto__.should.eql res2.__proto__
+
   it 'should init an new application object with some util functions', (done) ->
     app = sundae()
     app.should.have.properties 'request', 'response', 'controller', 'decorator'
@@ -18,10 +37,10 @@ describe 'Subapp', ->
 
     # User should implement this part in their codes
     foo = (params, callback) ->
-      req = app.request.derive()
+      req = app.request()
       req.set key, val, true for key, val of params
 
-      res = app.response.derive()
+      res = app.response()
       app.controller('rpc').call 'foo', req, res, callback
 
     # Test user function

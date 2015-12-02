@@ -65,16 +65,12 @@ class Request
       delete @[key]
     this
 
-  # Init a new req object
-  derive: ->
-    r = new Object
-    r.__proto__ = this
-    return r
-
 module.exports = request = (app) ->
   req = new Request
-  if app.request
-    app.request[key] = val for key, val of req
-  else
-    app.request = req
+  # Return a request constructor
+  app.request or= ->
+    r = {}
+    r.__proto__ = app.request
+    r
+  app.request[key] = val for key, val of req
   app

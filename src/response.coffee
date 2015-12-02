@@ -2,12 +2,6 @@
 
 class Response
 
-  # Init a new res object
-  derive: ->
-    r = new Object
-    r.__proto__ = this
-    return r
-
   # Implement this res.response function if you need the auto route to response
   response: ->
     if @err
@@ -19,8 +13,10 @@ class Response
 
 module.exports = response = (app) ->
   res = new Response
-  if app.response
-    app.response[key] = val for key, val of res
-  else
-    app.response = res
+  # Return a response constructor
+  app.response or= ->
+    r = {}
+    r.__proto__ = app.response
+    r
+  app.response[key] = val for key, val of res
   app
