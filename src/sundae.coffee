@@ -1,11 +1,13 @@
-router = require './router'
 request = require './request'
+response = require './response'
+router = require './router'
 controller = require './controller'
 decorator = require './decorator'
 
-sundae = (app) ->
-  router app
+sundae = (app = {}) ->
   request app
+  response app
+  router app
   controller app
   decorator app
   # Load build-in decorators

@@ -1,37 +1,40 @@
 # Request component
+_ = require 'lodash'
 
-module.exports = (app) ->
-  {request} = app
-  # Keys will import as request properties
-  request.importKeys = []
+class Request
 
-  # Keys allowed in `set` function when using allowed option
-  request.allowedKeys = []
+  constructor: ->
+    # Keys will import as request properties
+    @importKeys = []
 
-  # Alias keys will be converted to the value key
-  # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
-  # Keys should be lowercase
-  request.alias = {}
+    # Keys allowed in `set` function when using allowed option
+    @allowedKeys = []
 
-  # Validator for each key, value will be dropped if validator returns false
-  request.validators = {}
+    # Alias keys will be converted to the value key
+    # e.g. 'user-id' will be set as 'userId' if you set the alias as {'user-id': 'userId'}
+    # Keys should be lowercased
+    @alias = {}
 
-  # Custom setter for specific key
-  request.setters = {}
+    # Validator for each key, value will be dropped if validator returns false
+    @validators = {}
+
+    # Custom setter for specific key
+    @setters = {}
 
   # Get param in request object
   # @param {String} key
   # @return {Mixed} value
-  request.get = (key) ->
+  get: (key) ->
+    # Do not initialize _params map unless this request instance is constucted in route level
     @_params or= {}
-    return if key? then @_params[key] else @_params
+    if key? then @_params[key] else @_params
 
   # Set params in request object
-  # @param {String} `key` key-value's key
-  # @param {String} `val` key-value's value
-  # @param {Boolean} `onlyAllowed` only use allowed keys
-  # @return {Object} request object
-  request.set = (key, val, onlyAllowed = false) ->
+  # @param {String}   `key` key-value's key
+  # @param {Mixed}    `val` key-value's value
+  # @param {Boolean}  `onlyAllowed` only use allowed keys
+  # @return {Object}  This request object
+  set: (key, val, onlyAllowed = false) ->
     @_params or= {}
     aliasKey = @alias[key?.toLowerCase()]
     key = aliasKey if aliasKey?
@@ -53,11 +56,25 @@ module.exports = (app) ->
 
     @_params[key] = val
     @[key] = val if key in @importKeys
-    return this
+    this
 
   # Remove a property from params
-  request.remove = (keys...) ->
+  remove: (keys...) ->
     for key in keys
       delete @_params[key]
       delete @[key]
-    true
+    this
+
+  # Init a new req object
+  derive: ->
+    r = new Object
+    r.__proto__ = this
+    return r
+
+module.exports = request = (app) ->
+  req = new Request
+  if app.request
+    app.request[key] = val for key, val of req
+  else
+    app.request = req
+  app

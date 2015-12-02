@@ -105,18 +105,14 @@ module.exports = (app) ->
 
     _fn = app[method]
 
+    return unless toString.call(_fn) is '[object Function]'
+
     app[method] = (path) ->
 
       # Keep the polymorphism feature of `app.get` or other native express routes
       return _fn.apply this, arguments if arguments.length is 1
 
-      callback = app.routeCallback or (req, res) ->
-        if res.err
-          res.status(500).json
-            code: @err.code
-            message: @err.message
-        else if res.result
-          res.status(200).json res.result
+      callback = app.routeCallback or (req, res) -> res.response()
 
       # Add global prefix on each route
       if toString.call(path) is '[object String]' and app.routePrefix
