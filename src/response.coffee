@@ -5,11 +5,11 @@ class Response
   # Implement this res.response function if you need the auto route to response
   response: ->
     if @err
-      @status(500).json
+      @status(500).send
         code: @err.code
         message: @err.message
     else
-      @status(200).json @result
+      @status(200).send @result
 
 module.exports = response = (app) ->
   res = new Response
