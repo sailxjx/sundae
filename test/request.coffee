@@ -43,6 +43,10 @@ describe 'Sundae#Request', ->
     req.set 'email', 'grace@gmail.com'
     req.get('email').should.eql 'usergrace@gmail.com'
 
+    # Test has function
+    req.has('email').should.eql true
+    req.has('others').should.eql false
+
     # Test remove
     req.remove '_id'
     should(req._id).eql undefined

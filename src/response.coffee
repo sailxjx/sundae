@@ -2,7 +2,9 @@
 
 class Response
 
-  # Implement this res.response function if you need the auto route to response
+  ###*
+   * Implement this res.response function if you need the auto route to response
+  ###
   response: ->
     if @err
       @status(500).send

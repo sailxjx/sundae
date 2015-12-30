@@ -21,19 +21,23 @@ class Request
     # Custom setter for specific key
     @setters = {}
 
-  # Get param in request object
-  # @param {String} key
-  # @return {Mixed} value
+  ###*
+   * Get param in request object
+   * @param {String} key
+   * @return {Mixed} value
+  ###
   get: (key) ->
     # Do not initialize _params map unless this request instance is constucted in route level
     @_params or= {}
     if key? then @_params[key] else @_params
 
-  # Set params in request object
-  # @param {String}   `key` key-value's key
-  # @param {Mixed}    `val` key-value's value
-  # @param {Boolean}  `onlyAllowed` only use allowed keys
-  # @return {Object}  This request object
+  ###*
+   * Set params in request object
+   * @param {String}   `key` key-value's key
+   * @param {Mixed}    `val` key-value's value
+   * @param {Boolean}  `onlyAllowed` only use allowed keys
+   * @return {Object}  This request object
+  ###
   set: (key, val, onlyAllowed = false) ->
     @_params or= {}
     aliasKey = @alias[key?.toLowerCase()]
@@ -58,7 +62,18 @@ class Request
     @[key] = val if key in @importKeys
     this
 
-  # Remove a property from params
+  ###*
+   * Check if the key exists on _params
+   * @param  {String}  key
+   * @return {Boolean}
+  ###
+  has: (key) -> @_params?[key] isnt undefined
+
+  ###*
+   * Remove a property from params
+   * @param  {Strings} keys
+   * @return {Object} this
+  ###
   remove: (keys...) ->
     for key in keys
       delete @_params[key]
