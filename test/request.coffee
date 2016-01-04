@@ -5,16 +5,18 @@ sundae = require '../src/sundae'
 
 describe 'Sundae#Request', ->
 
-  app = sundae express()
-
-  req = app.request
-  req.importKeys = ['_id']
-  req.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
-  req.alias = address: 'location'
-  req.validators = fullname: (fullname) -> fullname.length < 10
-  req.setters = email: (email) -> "user" + email
-
   it 'should apply the alias/validators/setters when call set method', ->
+
+    app = sundae express()
+
+    app.request.importKeys = ['_id']
+    app.request.allowedKeys = ['_id', 'name', 'email', 'location', 'fullname']
+    app.request.alias = address: 'location'
+    app.request.validators = fullname: (fullname) -> fullname.length < 10
+    app.request.setters = email: (email) -> "user" + email
+
+    req = {}
+    req.__proto__ = app.request
     # Test importKeys
     req.set '_id', 1
     req._id.should.eql 1
@@ -41,7 +43,34 @@ describe 'Sundae#Request', ->
     req.set 'email', 'grace@gmail.com'
     req.get('email').should.eql 'usergrace@gmail.com'
 
+    # Test has function
+    req.has('email').should.eql true
+    req.has('others').should.eql false
+
     # Test remove
     req.remove '_id'
     should(req._id).eql undefined
     should(req.get('_id')).eql undefined
+
+  it 'should not share _params among all the request instances', (done) ->
+    app = sundae express()
+    app.request.allowedKeys = ['a', 'b']
+
+    app.controller 'custom', ->
+
+      @action '1', (req, res) ->
+        req.get().should.eql a: 'a'
+        res.end 'ok'
+
+      @action '2', (req, res) ->
+        req.get().should.eql b: 'b'
+        res.end 'ok'
+
+    app.get '/1', to: 'custom#1'
+    app.get '/2', to: 'custom#2'
+
+    supertest(app).get('/1?a=a').end (err, res) ->
+      res.text.should.eql 'ok'
+      supertest(app).get('/2?b=b').end (err, res) ->
+        res.text.should.eql 'ok'
+        done err

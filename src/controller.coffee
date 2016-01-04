@@ -117,9 +117,15 @@ class Controller
 
 module.exports = controller = (app) ->
   _controllers = {}
+
   app.controller = (ctrlName, ctrlFunc) ->
     unless _controllers[ctrlName]
       _controllers[ctrlName] = new Controller ctrlName
     _.assign _controllers[ctrlName], app._decorators
     ctrlFunc?.apply _controllers[ctrlName], _controllers[ctrlName]
     _controllers[ctrlName]
+
+  app.controllers = (controllers = {}) ->
+    for ctrlName, ctrlFunc of controllers
+      app.controller ctrlName, ctrlFunc
+    return _controllers
