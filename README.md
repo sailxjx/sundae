@@ -95,6 +95,9 @@ app.controller 'home', ->
 
 # Changelog
 
+## 0.6.1
+- Add `req.getParams` function to get the original param given by user
+
 ## 0.6.0
 - Support stand alone application build with sundae
 - Set app.request/response to an constructor when using sundae without express

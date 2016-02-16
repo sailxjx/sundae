@@ -22,12 +22,22 @@ class Request
     @setters = {}
 
   ###*
-   * Get param in request object
+   * Get properties in request object
    * @param {String} key
    * @return {Mixed} value
   ###
   get: (key) ->
-    # Do not initialize _params map unless this request instance is constucted in route level
+    # Do not initialize @_params and @_properties unless this request instance is constucted in route level
+    @_properties or= {}
+    if key? then @_properties[key] else @_properties
+
+
+  ###*
+   * Get params only from req.params/query/body/cookies/session
+   * @param  {String} key
+   * @return {Mixed} value
+  ###
+  getParams: (key) ->
     @_params or= {}
     if key? then @_params[key] else @_params
 
@@ -35,18 +45,25 @@ class Request
    * Set params in request object
    * @param {String}   `key` key-value's key
    * @param {Mixed}    `val` key-value's value
-   * @param {Boolean}  `onlyAllowed` only use allowed keys
+   * @param {Boolean}  `asParam` Set this property as a param given by user, and save the original param key value in @_params field
    * @return {Object}  This request object
   ###
-  set: (key, val, onlyAllowed = false) ->
+  set: (key, val, asParam = false) ->
     @_params or= {}
+    @_properties or= {}
+
+    # Do not call alias/setters/validators when set properties in the inner process
+    unless asParam
+      @_properties[key] = val
+      return this
+
     aliasKey = @alias[key?.toLowerCase()]
     key = aliasKey if aliasKey?
 
     if typeof @setters[key] is 'function'
-      return @_params[key] = @setters[key].call this, val
+      val = @setters[key].call this, val
 
-    return this if onlyAllowed and key not in @allowedKeys
+    return this if key not in @allowedKeys
 
     # Validators will filter the value and check for the returned value
     try
@@ -59,15 +76,17 @@ class Request
       throw err
 
     @_params[key] = val
+    @_properties[key] = val
     @[key] = val if key in @importKeys
     this
 
   ###*
-   * Check if the key exists on _params
+   * Check if the key exists on @_properties
    * @param  {String}  key
    * @return {Boolean}
   ###
-  has: (key) -> @_params?[key] isnt undefined
+  has: (key) ->
+    @_properties?[key] isnt undefined
 
   ###*
    * Remove a property from params
@@ -76,7 +95,8 @@ class Request
   ###
   remove: (keys...) ->
     for key in keys
-      delete @_params[key]
+      delete @_params?[key]
+      delete @_properties?[key]
       delete @[key]
     this
 

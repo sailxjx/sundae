@@ -18,30 +18,37 @@ describe 'Sundae#Request', ->
     req = {}
     req.__proto__ = app.request
     # Test importKeys
-    req.set '_id', 1
+    req.set '_id', 1, true
     req._id.should.eql 1
 
     # Test allowdKeys
-    req.set 'name', 'Grace'
+    req.set 'name', 'Grace', true
     req.set 'nickname', 'GG', true
     req.get().should.have.properties 'name'
     req.get().should.not.have.properties 'nickname'
 
     # Test alias
-    req.set 'address', 'Shanghai'
+    req.set 'address', 'Shanghai', true
     req.get('location').should.eql 'Shanghai'
 
     # Test validators
     try
-      req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b'
+      req.set 'fullname', 'Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb1111b', true
     catch err
       err.message.should.eql 'Param fullname is invalid'
 
     req.get().should.not.have.properties 'fullname'
 
     # Test setters
-    req.set 'email', 'grace@gmail.com'
-    req.get('email').should.eql 'usergrace@gmail.com'
+    req.set 'email', 'didi@gmail.com', true
+    req.get('email').should.eql 'userdidi@gmail.com'
+
+    # Test overwrite key
+    req.set 'email', 'didi@gmail.com', true
+    ## Overwrite email in the business logic layer (set asParam to false)
+    req.set 'email', 'dada@gmail.com'
+    req.get('email').should.eql 'dada@gmail.com'
+    req.getParams('email').should.eql 'userdidi@gmail.com'
 
     # Test has function
     req.has('email').should.eql true
